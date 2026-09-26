@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { PlatformLayout } from "../../components/PlatformLayout/PlatformLayout";
 import { apiRequest } from "../../utils/api";
 import { getFacultySession, getAdminSession } from "../../utils/session";
+import CsvQuestionImporter from "../../components/CsvQuestionImporter";
 
 const BATCH_OPTIONS = [
   { value: "ALL", label: "All Batches (Open to All)" },
@@ -44,9 +45,18 @@ export default function FacultyExamsPage({ role = "faculty" }) {
   });
   const [newCourseStatus, setNewCourseStatus] = useState({ loading: false, success: "", error: "" });
 
-  // Coding Modal State (supporting multi-problem & existing problem editing)
+  // Question Modal State (supporting manual MCQ/Coding and CSV Bulk Import)
   const [codingExamQuestions, setCodingExamQuestions] = useState([]);
   const [selectedQuestionId, setSelectedQuestionId] = useState("new");
+  const [questionAddMode, setQuestionAddMode] = useState("manual"); // "manual" | "csv"
+  const [manualQuestionType, setManualQuestionType] = useState("coding"); // "coding" | "mcq"
+  const [mcqForm, setMcqForm] = useState({
+    questionText: "",
+    options: ["", "", "", ""],
+    correctOptionIndex: 0,
+    marks: 1,
+    negativeMarks: 0
+  });
 
 function calculateDurationMinutes(startStr, endStr) {
   if (!startStr || !endStr) return null;
@@ -418,6 +428,7 @@ function calculateDurationMinutes(startStr, endStr) {
   // Open problem management modal (fetches existing questions attached to exam)
   async function openCodingModal(exam, forceNew = false) {
     setShowCodingModal(exam);
+    setQuestionAddMode("manual");
     setCodingStatus({ loading: true, success: "", error: "" });
     try {
       const asgData = await apiRequest(`/assignments/${exam.id}`, {}, session?.token);
@@ -427,21 +438,34 @@ function calculateDurationMinutes(startStr, endStr) {
       if (qs.length > 0 && !forceNew) {
         const firstQ = qs[0];
         setSelectedQuestionId(firstQ.id);
-        setCodingForm({
-          title: firstQ.title || firstQ.questionText || "",
-          statement: firstQ.statement || firstQ.questionText || "",
-          difficulty: firstQ.difficulty || "medium",
-          inputFormat: firstQ.inputFormat || "Standard Space-separated integers",
-          outputFormat: firstQ.outputFormat || "Output integer / array",
-          constraintsText: firstQ.constraintsText || "1 <= N <= 10^5",
-          marks: firstQ.marks || 25,
-          sampleInput: firstQ.sampleInput || (firstQ.sampleTestCases?.[0]?.input_data || ""),
-          sampleOutput: firstQ.sampleOutput || (firstQ.sampleTestCases?.[0]?.expected_output || ""),
-          hiddenInput: firstQ.hiddenInput || (firstQ.hiddenTestCases?.[0]?.input_data || ""),
-          hiddenOutput: firstQ.hiddenOutput || (firstQ.hiddenTestCases?.[0]?.expected_output || "")
-        });
+        if (firstQ.type === "mcq") {
+          setManualQuestionType("mcq");
+          setMcqForm({
+            questionText: firstQ.questionText || firstQ.title || "",
+            options: Array.isArray(firstQ.options) ? firstQ.options : ["", "", "", ""],
+            correctOptionIndex: typeof firstQ.correctOptionIndex === "number" ? firstQ.correctOptionIndex : 0,
+            marks: firstQ.marks || 1,
+            negativeMarks: firstQ.negativeMarks || 0
+          });
+        } else {
+          setManualQuestionType("coding");
+          setCodingForm({
+            title: firstQ.title || firstQ.questionText || "",
+            statement: firstQ.statement || firstQ.questionText || "",
+            difficulty: firstQ.difficulty || "medium",
+            inputFormat: firstQ.inputFormat || "Standard Space-separated integers",
+            outputFormat: firstQ.outputFormat || "Output integer / array",
+            constraintsText: firstQ.constraintsText || "1 <= N <= 10^5",
+            marks: firstQ.marks || 25,
+            sampleInput: firstQ.sampleInput || (firstQ.sampleTestCases?.[0]?.input_data || ""),
+            sampleOutput: firstQ.sampleOutput || (firstQ.sampleTestCases?.[0]?.expected_output || ""),
+            hiddenInput: firstQ.hiddenInput || (firstQ.hiddenTestCases?.[0]?.input_data || ""),
+            hiddenOutput: firstQ.hiddenOutput || (firstQ.hiddenTestCases?.[0]?.expected_output || "")
+          });
+        }
       } else {
         setSelectedQuestionId("new");
+        setManualQuestionType("coding");
         setCodingForm({
           title: "",
           statement: "",
@@ -454,6 +478,13 @@ function calculateDurationMinutes(startStr, endStr) {
           sampleOutput: "",
           hiddenInput: "",
           hiddenOutput: ""
+        });
+        setMcqForm({
+          questionText: "",
+          options: ["", "", "", ""],
+          correctOptionIndex: 0,
+          marks: 1,
+          negativeMarks: 0
         });
       }
       setCodingStatus({ loading: false, success: "", error: "" });
@@ -482,27 +513,46 @@ function calculateDurationMinutes(startStr, endStr) {
         hiddenInput: "",
         hiddenOutput: ""
       });
+      setMcqForm({
+        questionText: "",
+        options: ["", "", "", ""],
+        correctOptionIndex: 0,
+        marks: 1,
+        negativeMarks: 0
+      });
     } else {
       const q = codingExamQuestions.find((item) => item.id === qId);
       if (q) {
-        setCodingForm({
-          title: q.title || q.questionText || "",
-          statement: q.statement || q.questionText || "",
-          difficulty: q.difficulty || "medium",
-          inputFormat: q.inputFormat || "Standard Space-separated integers",
-          outputFormat: q.outputFormat || "Output integer / array",
-          constraintsText: q.constraintsText || "1 <= N <= 10^5",
-          marks: q.marks || 25,
-          sampleInput: q.sampleInput || (q.sampleTestCases?.[0]?.input_data || ""),
-          sampleOutput: q.sampleOutput || (q.sampleTestCases?.[0]?.expected_output || ""),
-          hiddenInput: q.hiddenInput || (q.hiddenTestCases?.[0]?.input_data || ""),
-          hiddenOutput: q.hiddenOutput || (q.hiddenTestCases?.[0]?.expected_output || "")
-        });
+        if (q.type === "mcq") {
+          setManualQuestionType("mcq");
+          setMcqForm({
+            questionText: q.questionText || q.title || "",
+            options: Array.isArray(q.options) ? q.options : ["", "", "", ""],
+            correctOptionIndex: typeof q.correctOptionIndex === "number" ? q.correctOptionIndex : 0,
+            marks: q.marks || 1,
+            negativeMarks: q.negativeMarks || 0
+          });
+        } else {
+          setManualQuestionType("coding");
+          setCodingForm({
+            title: q.title || q.questionText || "",
+            statement: q.statement || q.questionText || "",
+            difficulty: q.difficulty || "medium",
+            inputFormat: q.inputFormat || "Standard Space-separated integers",
+            outputFormat: q.outputFormat || "Output integer / array",
+            constraintsText: q.constraintsText || "1 <= N <= 10^5",
+            marks: q.marks || 25,
+            sampleInput: q.sampleInput || (q.sampleTestCases?.[0]?.input_data || ""),
+            sampleOutput: q.sampleOutput || (q.sampleTestCases?.[0]?.expected_output || ""),
+            hiddenInput: q.hiddenInput || (q.hiddenTestCases?.[0]?.input_data || ""),
+            hiddenOutput: q.hiddenOutput || (q.hiddenTestCases?.[0]?.expected_output || "")
+          });
+        }
       }
     }
   }
 
-  async function handleSaveCodingProblem(e, andAddAnother = false) {
+  async function handleSaveQuestion(e, andAddAnother = false) {
     if (e) e.preventDefault();
     setCodingStatus({ loading: true, success: "", error: "" });
 
@@ -511,57 +561,86 @@ function calculateDurationMinutes(startStr, endStr) {
       return;
     }
 
-    if (!codingForm.title?.trim()) {
-      setCodingStatus({ loading: false, success: "", error: "Problem title is required." });
-      return;
-    }
-
     try {
-      if (selectedQuestionId === "new") {
-        await apiRequest(
-          `/courses/${showCodingModal.courseId}/assignments/${showCodingModal.id}/questions`,
-          {
-            method: "POST",
-            body: JSON.stringify({
-              type: "coding",
-              title: codingForm.title,
-              statement: codingForm.statement,
-              difficulty: codingForm.difficulty,
-              inputFormat: codingForm.inputFormat,
-              outputFormat: codingForm.outputFormat,
-              constraintsText: codingForm.constraintsText,
-              marks: Number(codingForm.marks) || 25,
-              sampleInput: codingForm.sampleInput,
-              sampleOutput: codingForm.sampleOutput,
-              hiddenInput: codingForm.hiddenInput,
-              hiddenOutput: codingForm.hiddenOutput
-            })
-          },
-          session.token
-        );
-        setCodingStatus({ loading: false, success: "Coding Problem & Test Cases added successfully!", error: "" });
+      if (manualQuestionType === "mcq") {
+        if (!mcqForm.questionText?.trim()) {
+          setCodingStatus({ loading: false, success: "", error: "MCQ question text is required." });
+          return;
+        }
+
+        const payload = {
+          type: "mcq",
+          questionText: mcqForm.questionText.trim(),
+          options: mcqForm.options.map((opt) => opt.trim()),
+          correctOptionIndex: Number(mcqForm.correctOptionIndex) || 0,
+          marks: Number(mcqForm.marks) || 1,
+          negativeMarks: Number(mcqForm.negativeMarks) || 0
+        };
+
+        if (selectedQuestionId === "new") {
+          await apiRequest(
+            `/courses/${showCodingModal.courseId}/assignments/${showCodingModal.id}/questions`,
+            {
+              method: "POST",
+              body: JSON.stringify(payload)
+            },
+            session.token
+          );
+          setCodingStatus({ loading: false, success: "MCQ Question added successfully!", error: "" });
+        } else {
+          await apiRequest(
+            `/courses/${showCodingModal.courseId}/assignments/${showCodingModal.id}/questions/${selectedQuestionId}`,
+            {
+              method: "PUT",
+              body: JSON.stringify(payload)
+            },
+            session.token
+          );
+          setCodingStatus({ loading: false, success: "MCQ Question updated successfully!", error: "" });
+        }
       } else {
-        await apiRequest(
-          `/courses/${showCodingModal.courseId}/assignments/${showCodingModal.id}/questions/${selectedQuestionId}`,
-          {
-            method: "PUT",
-            body: JSON.stringify({
-              title: codingForm.title,
-              statement: codingForm.statement,
-              difficulty: codingForm.difficulty,
-              inputFormat: codingForm.inputFormat,
-              outputFormat: codingForm.outputFormat,
-              constraintsText: codingForm.constraintsText,
-              marks: Number(codingForm.marks) || 25,
-              sampleInput: codingForm.sampleInput,
-              sampleOutput: codingForm.sampleOutput,
-              hiddenInput: codingForm.hiddenInput,
-              hiddenOutput: codingForm.hiddenOutput
-            })
-          },
-          session.token
-        );
-        setCodingStatus({ loading: false, success: "Coding Problem & Test Cases updated successfully!", error: "" });
+        // Coding Question
+        if (!codingForm.title?.trim()) {
+          setCodingStatus({ loading: false, success: "", error: "Problem title is required." });
+          return;
+        }
+
+        const payload = {
+          type: "coding",
+          title: codingForm.title,
+          statement: codingForm.statement,
+          difficulty: codingForm.difficulty,
+          inputFormat: codingForm.inputFormat,
+          outputFormat: codingForm.outputFormat,
+          constraintsText: codingForm.constraintsText,
+          marks: Number(codingForm.marks) || 25,
+          sampleInput: codingForm.sampleInput,
+          sampleOutput: codingForm.sampleOutput,
+          hiddenInput: codingForm.hiddenInput,
+          hiddenOutput: codingForm.hiddenOutput
+        };
+
+        if (selectedQuestionId === "new") {
+          await apiRequest(
+            `/courses/${showCodingModal.courseId}/assignments/${showCodingModal.id}/questions`,
+            {
+              method: "POST",
+              body: JSON.stringify(payload)
+            },
+            session.token
+          );
+          setCodingStatus({ loading: false, success: "Coding Problem & Test Cases added successfully!", error: "" });
+        } else {
+          await apiRequest(
+            `/courses/${showCodingModal.courseId}/assignments/${showCodingModal.id}/questions/${selectedQuestionId}`,
+            {
+              method: "PUT",
+              body: JSON.stringify(payload)
+            },
+            session.token
+          );
+          setCodingStatus({ loading: false, success: "Coding Problem & Test Cases updated successfully!", error: "" });
+        }
       }
 
       const asgData = await apiRequest(`/assignments/${showCodingModal.id}`, {}, session?.token);
@@ -584,14 +663,53 @@ function calculateDurationMinutes(startStr, endStr) {
           hiddenInput: "",
           hiddenOutput: ""
         });
+        setMcqForm({
+          questionText: "",
+          options: ["", "", "", ""],
+          correctOptionIndex: 0,
+          marks: 1,
+          negativeMarks: 0
+        });
       }
     } catch (err) {
       setCodingStatus({ loading: false, success: "", error: err.message });
     }
   }
 
+  async function handleBulkImportQuestions(parsedQuestions) {
+    if (!showCodingModal?.courseId || !showCodingModal?.id) return;
+    setCodingStatus({ loading: true, success: "", error: "" });
+    try {
+      const res = await apiRequest(
+        `/courses/${showCodingModal.courseId}/assignments/${showCodingModal.id}/questions/bulk`,
+        {
+          method: "POST",
+          body: JSON.stringify({ questions: parsedQuestions })
+        },
+        session.token
+      );
+
+      const asgData = await apiRequest(`/assignments/${showCodingModal.id}`, {}, session?.token);
+      const qs = Array.isArray(asgData?.questions) ? asgData.questions : [];
+      setCodingExamQuestions(qs);
+      loadFacultyExams();
+
+      setCodingStatus({
+        loading: false,
+        success: res.message || `Successfully imported ${parsedQuestions.length} questions into exam!`,
+        error: ""
+      });
+      setQuestionAddMode("manual");
+      if (qs.length > 0) {
+        selectQuestionTab(qs[qs.length - 1].id);
+      }
+    } catch (err) {
+      setCodingStatus({ loading: false, success: "", error: err.message || "Bulk import failed." });
+    }
+  }
+
   async function handleDeleteQuestion(qId) {
-    if (!window.confirm("Are you sure you want to remove this problem from the test?")) return;
+    if (!window.confirm("Are you sure you want to remove this question from the test?")) return;
     setCodingStatus({ loading: true, success: "", error: "" });
     try {
       await apiRequest(
@@ -610,7 +728,7 @@ function calculateDurationMinutes(startStr, endStr) {
       } else {
         selectQuestionTab("new");
       }
-      setCodingStatus({ loading: false, success: "Problem removed successfully.", error: "" });
+      setCodingStatus({ loading: false, success: "Question removed successfully.", error: "" });
     } catch (err) {
       setCodingStatus({ loading: false, success: "", error: err.message });
     }
@@ -1075,8 +1193,8 @@ function calculateDurationMinutes(startStr, endStr) {
                       transition: "transform 0.15s ease"
                     }}
                   >
-                    <span>💻</span>
-                    <span>{exam.questionsCount > 0 ? `Manage & Edit Coding Problems (${exam.questionsCount})` : `Add Coding Problem & Test Cases`}</span>
+                    <span>📝</span>
+                    <span>{exam.questionsCount > 0 ? `Manage & Edit Questions (${exam.questionsCount})` : `Add Questions (Manual / CSV)`}</span>
                   </button>
                 </div>
               </div>
@@ -1730,7 +1848,7 @@ function calculateDurationMinutes(startStr, endStr) {
               border: "1px solid var(--lc-border)",
               borderRadius: "16px",
               padding: "2rem",
-              maxWidth: "700px",
+              maxWidth: "760px",
               width: "100%",
               maxHeight: "92vh",
               overflowY: "auto"
@@ -1749,7 +1867,7 @@ function calculateDurationMinutes(startStr, endStr) {
                       border: "1px solid rgba(16, 185, 129, 0.3)",
                       textTransform: "uppercase"
                     }}>
-                      Coding Problems & Test Cases
+                      Assessment Questions ({codingExamQuestions.length})
                     </span>
                   </div>
                   <h2 style={{ fontSize: "1.4rem", fontWeight: 800, margin: 0, color: "var(--lc-text-primary)" }}>
@@ -1776,56 +1894,60 @@ function calculateDurationMinutes(startStr, endStr) {
                 </button>
               </div>
 
-              {/* Problem Tabs Navigation */}
+              {/* Main Mode Toggle: Manual Builder vs CSV Importer */}
               <div style={{
-                display: "flex",
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
                 gap: "0.5rem",
-                overflowX: "auto",
-                paddingBottom: "0.75rem",
                 marginBottom: "1.25rem",
-                borderBottom: "1px solid var(--lc-border)"
+                background: "rgba(255, 255, 255, 0.04)",
+                padding: "0.35rem",
+                borderRadius: "10px",
+                border: "1px solid var(--lc-border)"
               }}>
-                {codingExamQuestions.map((q, idx) => (
-                  <button
-                    key={q.id}
-                    type="button"
-                    onClick={() => selectQuestionTab(q.id)}
-                    style={{
-                      background: selectedQuestionId === q.id ? "rgba(16, 185, 129, 0.2)" : "rgba(255, 255, 255, 0.05)",
-                      color: selectedQuestionId === q.id ? "#10b981" : "var(--lc-text-muted)",
-                      border: "1px solid",
-                      borderColor: selectedQuestionId === q.id ? "#10b981" : "var(--lc-border)",
-                      borderRadius: "8px",
-                      padding: "0.4rem 0.8rem",
-                      fontSize: "0.8rem",
-                      fontWeight: 600,
-                      cursor: "pointer",
-                      whiteSpace: "nowrap",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "0.35rem"
-                    }}
-                  >
-                    <span>Q{idx + 1}: {q.title || "Coding Problem"}</span>
-                  </button>
-                ))}
-
                 <button
                   type="button"
-                  onClick={() => selectQuestionTab("new")}
+                  onClick={() => setQuestionAddMode("manual")}
                   style={{
-                    background: selectedQuestionId === "new" ? "var(--lc-accent, #ff7e29)" : "rgba(255, 126, 41, 0.1)",
-                    color: selectedQuestionId === "new" ? "#fff" : "var(--lc-accent, #ff7e29)",
-                    border: "1px dashed var(--lc-accent, #ff7e29)",
+                    padding: "0.55rem 1rem",
                     borderRadius: "8px",
-                    padding: "0.4rem 0.8rem",
-                    fontSize: "0.8rem",
+                    fontSize: "0.85rem",
                     fontWeight: 700,
                     cursor: "pointer",
-                    whiteSpace: "nowrap"
+                    border: "none",
+                    background: questionAddMode === "manual" ? "var(--lc-accent, #ff7e29)" : "transparent",
+                    color: questionAddMode === "manual" ? "#fff" : "var(--lc-text-muted)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "0.45rem",
+                    transition: "all 0.15s ease"
                   }}
                 >
-                  + Add Another Problem
+                  <span>✍️</span>
+                  <span>Add Question Manually</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setQuestionAddMode("csv")}
+                  style={{
+                    padding: "0.55rem 1rem",
+                    borderRadius: "8px",
+                    fontSize: "0.85rem",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    border: "none",
+                    background: questionAddMode === "csv" ? "var(--lc-accent, #ff7e29)" : "transparent",
+                    color: questionAddMode === "csv" ? "#fff" : "var(--lc-text-muted)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "0.45rem",
+                    transition: "all 0.15s ease"
+                  }}
+                >
+                  <span>📄</span>
+                  <span>Import via CSV File</span>
                 </button>
               </div>
 
@@ -1841,234 +1963,457 @@ function calculateDurationMinutes(startStr, endStr) {
                 </div>
               )}
 
-              <form onSubmit={(e) => handleSaveCodingProblem(e, false)}>
-                <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: "0.75rem", marginBottom: "1rem" }}>
-                  <div className="lc-form-group">
-                    <label className="lc-input-label lc-input-label-required">Problem Title</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Reverse a Linked List / Two Sum"
-                      className="lc-form-input"
-                      value={codingForm.title}
-                      onChange={(e) => setCodingForm({ ...codingForm, title: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div className="lc-form-group">
-                    <label className="lc-input-label">Difficulty</label>
-                    <select
-                      className="lc-form-input"
-                      value={codingForm.difficulty}
-                      onChange={(e) => setCodingForm({ ...codingForm, difficulty: e.target.value })}
-                    >
-                      <option value="easy">Easy</option>
-                      <option value="medium">Medium</option>
-                      <option value="hard">Hard</option>
-                    </select>
-                  </div>
-                  <div className="lc-form-group">
-                    <label className="lc-input-label">Marks</label>
-                    <input
-                      type="number"
-                      min="1"
-                      max="100"
-                      className="lc-form-input"
-                      value={codingForm.marks}
-                      onChange={(e) => setCodingForm({ ...codingForm, marks: e.target.value })}
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="lc-form-group" style={{ marginBottom: "1rem" }}>
-                  <label className="lc-input-label lc-input-label-required">Problem Statement & Description</label>
-                  <textarea
-                    placeholder="Provide detailed problem description, explanation, examples..."
-                    className="lc-form-input"
-                    rows="3"
-                    value={codingForm.statement}
-                    onChange={(e) => setCodingForm({ ...codingForm, statement: e.target.value })}
-                    required
-                  />
-                </div>
-
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem", marginBottom: "1rem" }}>
-                  <div className="lc-form-group">
-                    <label className="lc-input-label">Input Format</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. First line contains N, second line array"
-                      className="lc-form-input"
-                      value={codingForm.inputFormat}
-                      onChange={(e) => setCodingForm({ ...codingForm, inputFormat: e.target.value })}
-                    />
-                  </div>
-                  <div className="lc-form-group">
-                    <label className="lc-input-label">Output Format</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Print space-separated integers"
-                      className="lc-form-input"
-                      value={codingForm.outputFormat}
-                      onChange={(e) => setCodingForm({ ...codingForm, outputFormat: e.target.value })}
-                    />
-                  </div>
-                </div>
-
-                <div className="lc-form-group" style={{ marginBottom: "1rem" }}>
-                  <label className="lc-input-label">Constraints</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. 1 <= N <= 10^5, -10^9 <= Arr[i] <= 10^9"
-                    className="lc-form-input"
-                    value={codingForm.constraintsText}
-                    onChange={(e) => setCodingForm({ ...codingForm, constraintsText: e.target.value })}
-                  />
-                </div>
-
-                {/* Test Cases Section */}
-                <div style={{ background: "rgba(0, 0, 0, 0.25)", padding: "1rem", borderRadius: "10px", marginBottom: "1.25rem", border: "1px solid var(--lc-border)" }}>
-                  <div style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--lc-text-primary)", marginBottom: "0.75rem", display: "flex", alignItems: "center", gap: "0.4rem" }}>
-                    🧪 Automated Judge Test Cases
-                  </div>
-
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem", marginBottom: "0.75rem" }}>
-                    <div className="lc-form-group">
-                      <label className="lc-input-label" style={{ fontSize: "0.75rem", color: "#60a5fa" }}>
-                        Sample Input Case (Visible to students)
-                      </label>
-                      <textarea
-                        placeholder="e.g. 5&#10;1 2 3 4 5"
-                        className="lc-form-input"
-                        rows="2"
-                        value={codingForm.sampleInput}
-                        onChange={(e) => setCodingForm({ ...codingForm, sampleInput: e.target.value })}
-                      />
-                    </div>
-                    <div className="lc-form-group">
-                      <label className="lc-input-label" style={{ fontSize: "0.75rem", color: "#60a5fa" }}>
-                        Expected Sample Output
-                      </label>
-                      <textarea
-                        placeholder="e.g. 5 4 3 2 1"
-                        className="lc-form-input"
-                        rows="2"
-                        value={codingForm.sampleOutput}
-                        onChange={(e) => setCodingForm({ ...codingForm, sampleOutput: e.target.value })}
-                      />
-                    </div>
-                  </div>
-
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
-                    <div className="lc-form-group">
-                      <label className="lc-input-label" style={{ fontSize: "0.75rem", color: "#f59e0b" }}>
-                        Hidden Judge Input (For evaluation grading)
-                      </label>
-                      <textarea
-                        placeholder="e.g. 8&#10;10 20 30 40 50 60 70 80"
-                        className="lc-form-input"
-                        rows="2"
-                        value={codingForm.hiddenInput}
-                        onChange={(e) => setCodingForm({ ...codingForm, hiddenInput: e.target.value })}
-                      />
-                    </div>
-                    <div className="lc-form-group">
-                      <label className="lc-input-label" style={{ fontSize: "0.75rem", color: "#f59e0b" }}>
-                        Expected Hidden Output
-                      </label>
-                      <textarea
-                        placeholder="e.g. 80 70 60 50 40 30 20 10"
-                        className="lc-form-input"
-                        rows="2"
-                        value={codingForm.hiddenOutput}
-                        onChange={(e) => setCodingForm({ ...codingForm, hiddenOutput: e.target.value })}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Footer Buttons */}
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.75rem" }}>
-                  <div>
-                    {selectedQuestionId !== "new" && (
+              {/* CSV Import Mode */}
+              {questionAddMode === "csv" ? (
+                <CsvQuestionImporter
+                  onImport={handleBulkImportQuestions}
+                  targetLabel={showCodingModal.title}
+                  isSubmitting={codingStatus.loading}
+                  allowedTypes="all"
+                />
+              ) : (
+                /* Manual Mode */
+                <div>
+                  {/* Problem Tabs Navigation */}
+                  <div style={{
+                    display: "flex",
+                    gap: "0.5rem",
+                    overflowX: "auto",
+                    paddingBottom: "0.75rem",
+                    marginBottom: "1.25rem",
+                    borderBottom: "1px solid var(--lc-border)"
+                  }}>
+                    {codingExamQuestions.map((q, idx) => (
                       <button
+                        key={q.id}
                         type="button"
-                        onClick={() => handleDeleteQuestion(selectedQuestionId)}
+                        onClick={() => selectQuestionTab(q.id)}
                         style={{
-                          background: "rgba(239, 68, 68, 0.15)",
-                          color: "#ef4444",
-                          border: "1px solid rgba(239, 68, 68, 0.3)",
+                          background: selectedQuestionId === q.id ? "rgba(16, 185, 129, 0.2)" : "rgba(255, 255, 255, 0.05)",
+                          color: selectedQuestionId === q.id ? "#10b981" : "var(--lc-text-muted)",
+                          border: "1px solid",
+                          borderColor: selectedQuestionId === q.id ? "#10b981" : "var(--lc-border)",
                           borderRadius: "8px",
-                          padding: "0.55rem 1rem",
-                          fontWeight: 600,
+                          padding: "0.4rem 0.8rem",
                           fontSize: "0.8rem",
-                          cursor: "pointer"
+                          fontWeight: 600,
+                          cursor: "pointer",
+                          whiteSpace: "nowrap",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "0.35rem"
                         }}
                       >
-                        🗑️ Remove Problem
+                        <span>{q.type === "mcq" ? "🔘 MCQ" : "💻 Code"} Q{idx + 1}</span>
                       </button>
+                    ))}
+
+                    <button
+                      type="button"
+                      onClick={() => selectQuestionTab("new")}
+                      style={{
+                        background: selectedQuestionId === "new" ? "var(--lc-accent, #ff7e29)" : "rgba(255, 126, 41, 0.1)",
+                        color: selectedQuestionId === "new" ? "#fff" : "var(--lc-accent, #ff7e29)",
+                        border: "1px dashed var(--lc-accent, #ff7e29)",
+                        borderRadius: "8px",
+                        padding: "0.4rem 0.8rem",
+                        fontSize: "0.8rem",
+                        fontWeight: 700,
+                        cursor: "pointer",
+                        whiteSpace: "nowrap"
+                      }}
+                    >
+                      + Add Question
+                    </button>
+                  </div>
+
+                  {/* Question Type Selector for New Questions */}
+                  {selectedQuestionId === "new" && (
+                    <div style={{ display: "flex", gap: "0.75rem", marginBottom: "1.25rem" }}>
+                      <button
+                        type="button"
+                        onClick={() => setManualQuestionType("coding")}
+                        style={{
+                          flex: 1,
+                          padding: "0.6rem",
+                          borderRadius: "8px",
+                          border: "1px solid",
+                          borderColor: manualQuestionType === "coding" ? "#10b981" : "var(--lc-border)",
+                          background: manualQuestionType === "coding" ? "rgba(16, 185, 129, 0.15)" : "rgba(255, 255, 255, 0.03)",
+                          color: manualQuestionType === "coding" ? "#10b981" : "var(--lc-text-muted)",
+                          fontWeight: 700,
+                          fontSize: "0.85rem",
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: "0.4rem"
+                        }}
+                      >
+                        <span>💻 Coding Problem</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setManualQuestionType("mcq")}
+                        style={{
+                          flex: 1,
+                          padding: "0.6rem",
+                          borderRadius: "8px",
+                          border: "1px solid",
+                          borderColor: manualQuestionType === "mcq" ? "#38bdf8" : "var(--lc-border)",
+                          background: manualQuestionType === "mcq" ? "rgba(56, 189, 248, 0.15)" : "rgba(255, 255, 255, 0.03)",
+                          color: manualQuestionType === "mcq" ? "#38bdf8" : "var(--lc-text-muted)",
+                          fontWeight: 700,
+                          fontSize: "0.85rem",
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: "0.4rem"
+                        }}
+                      >
+                        <span>🔘 Multiple Choice (MCQ)</span>
+                      </button>
+                    </div>
+                  )}
+
+                  <form onSubmit={(e) => handleSaveQuestion(e, false)}>
+                    {/* CODING PROBLEM FORM */}
+                    {manualQuestionType === "coding" && (
+                      <div>
+                        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: "0.75rem", marginBottom: "1rem" }}>
+                          <div className="lc-form-group">
+                            <label className="lc-input-label lc-input-label-required">Problem Title</label>
+                            <input
+                              type="text"
+                              placeholder="e.g. Reverse a Linked List / Two Sum"
+                              className="lc-form-input"
+                              value={codingForm.title}
+                              onChange={(e) => setCodingForm({ ...codingForm, title: e.target.value })}
+                              required
+                            />
+                          </div>
+                          <div className="lc-form-group">
+                            <label className="lc-input-label">Difficulty</label>
+                            <select
+                              className="lc-form-input"
+                              value={codingForm.difficulty}
+                              onChange={(e) => setCodingForm({ ...codingForm, difficulty: e.target.value })}
+                            >
+                              <option value="easy">Easy</option>
+                              <option value="medium">Medium</option>
+                              <option value="hard">Hard</option>
+                            </select>
+                          </div>
+                          <div className="lc-form-group">
+                            <label className="lc-input-label">Marks</label>
+                            <input
+                              type="number"
+                              min="1"
+                              max="100"
+                              className="lc-form-input"
+                              value={codingForm.marks}
+                              onChange={(e) => setCodingForm({ ...codingForm, marks: e.target.value })}
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        <div className="lc-form-group" style={{ marginBottom: "1rem" }}>
+                          <label className="lc-input-label lc-input-label-required">Problem Statement &amp; Description</label>
+                          <textarea
+                            placeholder="Provide detailed problem description, explanation, examples..."
+                            className="lc-form-input"
+                            rows="3"
+                            value={codingForm.statement}
+                            onChange={(e) => setCodingForm({ ...codingForm, statement: e.target.value })}
+                            required
+                          />
+                        </div>
+
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem", marginBottom: "1rem" }}>
+                          <div className="lc-form-group">
+                            <label className="lc-input-label">Input Format</label>
+                            <input
+                              type="text"
+                              placeholder="e.g. First line contains N, second line array"
+                              className="lc-form-input"
+                              value={codingForm.inputFormat}
+                              onChange={(e) => setCodingForm({ ...codingForm, inputFormat: e.target.value })}
+                            />
+                          </div>
+                          <div className="lc-form-group">
+                            <label className="lc-input-label">Output Format</label>
+                            <input
+                              type="text"
+                              placeholder="e.g. Print space-separated integers"
+                              className="lc-form-input"
+                              value={codingForm.outputFormat}
+                              onChange={(e) => setCodingForm({ ...codingForm, outputFormat: e.target.value })}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="lc-form-group" style={{ marginBottom: "1rem" }}>
+                          <label className="lc-input-label">Constraints</label>
+                          <input
+                            type="text"
+                            placeholder="e.g. 1 <= N <= 10^5, -10^9 <= Arr[i] <= 10^9"
+                            className="lc-form-input"
+                            value={codingForm.constraintsText}
+                            onChange={(e) => setCodingForm({ ...codingForm, constraintsText: e.target.value })}
+                          />
+                        </div>
+
+                        {/* Test Cases Section */}
+                        <div style={{ background: "rgba(0, 0, 0, 0.25)", padding: "1rem", borderRadius: "10px", marginBottom: "1.25rem", border: "1px solid var(--lc-border)" }}>
+                          <div style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--lc-text-primary)", marginBottom: "0.75rem", display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                            🧪 Automated Judge Test Cases
+                          </div>
+
+                          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem", marginBottom: "0.75rem" }}>
+                            <div className="lc-form-group">
+                              <label className="lc-input-label" style={{ fontSize: "0.75rem", color: "#60a5fa" }}>
+                                Sample Input Case (Visible to students)
+                              </label>
+                              <textarea
+                                placeholder="e.g. 5&#10;1 2 3 4 5"
+                                className="lc-form-input"
+                                rows="2"
+                                value={codingForm.sampleInput}
+                                onChange={(e) => setCodingForm({ ...codingForm, sampleInput: e.target.value })}
+                              />
+                            </div>
+                            <div className="lc-form-group">
+                              <label className="lc-input-label" style={{ fontSize: "0.75rem", color: "#60a5fa" }}>
+                                Expected Sample Output
+                              </label>
+                              <textarea
+                                placeholder="e.g. 5 4 3 2 1"
+                                className="lc-form-input"
+                                rows="2"
+                                value={codingForm.sampleOutput}
+                                onChange={(e) => setCodingForm({ ...codingForm, sampleOutput: e.target.value })}
+                              />
+                            </div>
+                          </div>
+
+                          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
+                            <div className="lc-form-group">
+                              <label className="lc-input-label" style={{ fontSize: "0.75rem", color: "#f59e0b" }}>
+                                Hidden Judge Input (For evaluation grading)
+                              </label>
+                              <textarea
+                                placeholder="e.g. 8&#10;10 20 30 40 50 60 70 80"
+                                className="lc-form-input"
+                                rows="2"
+                                value={codingForm.hiddenInput}
+                                onChange={(e) => setCodingForm({ ...codingForm, hiddenInput: e.target.value })}
+                              />
+                            </div>
+                            <div className="lc-form-group">
+                              <label className="lc-input-label" style={{ fontSize: "0.75rem", color: "#f59e0b" }}>
+                                Expected Hidden Output
+                              </label>
+                              <textarea
+                                placeholder="e.g. 80 70 60 50 40 30 20 10"
+                                className="lc-form-input"
+                                rows="2"
+                                value={codingForm.hiddenOutput}
+                                onChange={(e) => setCodingForm({ ...codingForm, hiddenOutput: e.target.value })}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     )}
-                  </div>
 
-                  <div style={{ display: "flex", gap: "0.5rem" }}>
-                    <button
-                      type="button"
-                      onClick={() => setShowCodingModal(null)}
-                      style={{
-                        background: "rgba(255, 255, 255, 0.1)",
-                        color: "#fff",
-                        border: "none",
-                        borderRadius: "8px",
-                        padding: "0.6rem 1.2rem",
-                        cursor: "pointer",
-                        fontSize: "0.85rem"
-                      }}
-                    >
-                      Done / Close
-                    </button>
+                    {/* MCQ FORM */}
+                    {manualQuestionType === "mcq" && (
+                      <div>
+                        <div className="lc-form-group" style={{ marginBottom: "1rem" }}>
+                          <label className="lc-input-label lc-input-label-required">Question Text / Prompt</label>
+                          <textarea
+                            placeholder="Enter multiple choice question statement..."
+                            className="lc-form-input"
+                            rows="3"
+                            value={mcqForm.questionText}
+                            onChange={(e) => setMcqForm({ ...mcqForm, questionText: e.target.value })}
+                            required
+                          />
+                        </div>
 
-                    <button
-                      type="button"
-                      onClick={(e) => handleSaveCodingProblem(e, true)}
-                      disabled={codingStatus.loading}
-                      style={{
-                        background: "rgba(255, 126, 41, 0.15)",
-                        color: "#ff7e29",
-                        border: "1px solid rgba(255, 126, 41, 0.4)",
-                        borderRadius: "8px",
-                        padding: "0.6rem 1.2rem",
-                        fontWeight: 700,
-                        cursor: "pointer",
-                        fontSize: "0.85rem"
-                      }}
-                    >
-                      + Save & Add Another
-                    </button>
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem", marginBottom: "1rem" }}>
+                          <div className="lc-form-group">
+                            <label className="lc-input-label">Marks</label>
+                            <input
+                              type="number"
+                              min="1"
+                              max="100"
+                              className="lc-form-input"
+                              value={mcqForm.marks}
+                              onChange={(e) => setMcqForm({ ...mcqForm, marks: Number(e.target.value) })}
+                              required
+                            />
+                          </div>
+                          <div className="lc-form-group">
+                            <label className="lc-input-label">Negative Marks (Penalty)</label>
+                            <input
+                              type="number"
+                              min="0"
+                              max="50"
+                              className="lc-form-input"
+                              value={mcqForm.negativeMarks}
+                              onChange={(e) => setMcqForm({ ...mcqForm, negativeMarks: Number(e.target.value) })}
+                            />
+                          </div>
+                        </div>
 
-                    <button
-                      type="submit"
-                      disabled={codingStatus.loading}
-                      style={{
-                        background: "#10b981",
-                        color: "#fff",
-                        border: "none",
-                        borderRadius: "8px",
-                        padding: "0.6rem 1.4rem",
-                        fontWeight: 700,
-                        cursor: "pointer",
-                        fontSize: "0.85rem",
-                        boxShadow: "0 2px 8px rgba(16, 185, 129, 0.3)"
-                      }}
-                    >
-                      {codingStatus.loading
-                        ? "Saving..."
-                        : selectedQuestionId === "new"
-                        ? "💾 Save Problem & Test Cases"
-                        : "💾 Update Problem"}
-                    </button>
-                  </div>
+                        <div style={{ background: "rgba(0, 0, 0, 0.25)", padding: "1rem", borderRadius: "10px", marginBottom: "1.25rem", border: "1px solid var(--lc-border)" }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
+                            <span style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--lc-text-primary)" }}>
+                              🔘 Options (Select the correct answer)
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => setMcqForm({ ...mcqForm, options: [...mcqForm.options, ""] })}
+                              style={{ background: "rgba(56, 189, 248, 0.15)", color: "#38bdf8", border: "1px solid rgba(56, 189, 248, 0.3)", borderRadius: "6px", padding: "0.25rem 0.6rem", fontSize: "0.75rem", fontWeight: 600, cursor: "pointer" }}
+                            >
+                              + Add Option
+                            </button>
+                          </div>
+
+                          <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
+                            {mcqForm.options.map((opt, oIdx) => (
+                              <div key={oIdx} style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+                                <label style={{ display: "flex", alignItems: "center", gap: "0.4rem", cursor: "pointer", color: mcqForm.correctOptionIndex === oIdx ? "#10b981" : "var(--lc-text-muted)", fontWeight: 700, fontSize: "0.85rem", minWidth: "85px" }}>
+                                  <input
+                                    type="radio"
+                                    name="correctOption"
+                                    checked={mcqForm.correctOptionIndex === oIdx}
+                                    onChange={() => setMcqForm({ ...mcqForm, correctOptionIndex: oIdx })}
+                                    style={{ cursor: "pointer", accentColor: "#10b981" }}
+                                  />
+                                  <span>{String.fromCharCode(65 + oIdx)} {mcqForm.correctOptionIndex === oIdx ? "✓" : ""}</span>
+                                </label>
+                                <input
+                                  type="text"
+                                  className="lc-form-input"
+                                  placeholder={`Option ${String.fromCharCode(65 + oIdx)} text`}
+                                  value={opt}
+                                  onChange={(e) => {
+                                    const nextOpts = [...mcqForm.options];
+                                    nextOpts[oIdx] = e.target.value;
+                                    setMcqForm({ ...mcqForm, options: nextOpts });
+                                  }}
+                                  required
+                                  style={{ margin: 0 }}
+                                />
+                                {mcqForm.options.length > 2 && (
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const nextOpts = mcqForm.options.filter((_, idx) => idx !== oIdx);
+                                      const nextCorrect = mcqForm.correctOptionIndex >= nextOpts.length ? 0 : mcqForm.correctOptionIndex;
+                                      setMcqForm({ ...mcqForm, options: nextOpts, correctOptionIndex: nextCorrect });
+                                    }}
+                                    style={{ background: "rgba(239, 68, 68, 0.15)", color: "#f87171", border: "none", borderRadius: "6px", padding: "0.4rem 0.6rem", cursor: "pointer", fontSize: "0.75rem" }}
+                                    title="Delete this option"
+                                  >
+                                    ✕
+                                  </button>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Footer Buttons */}
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.75rem" }}>
+                      <div>
+                        {selectedQuestionId !== "new" && (
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteQuestion(selectedQuestionId)}
+                            style={{
+                              background: "rgba(239, 68, 68, 0.15)",
+                              color: "#ef4444",
+                              border: "1px solid rgba(239, 68, 68, 0.3)",
+                              borderRadius: "8px",
+                              padding: "0.55rem 1rem",
+                              fontWeight: 600,
+                              fontSize: "0.8rem",
+                              cursor: "pointer"
+                            }}
+                          >
+                            🗑️ Remove Question
+                          </button>
+                        )}
+                      </div>
+
+                      <div style={{ display: "flex", gap: "0.5rem" }}>
+                        <button
+                          type="button"
+                          onClick={() => setShowCodingModal(null)}
+                          style={{
+                            background: "rgba(255, 255, 255, 0.1)",
+                            color: "#fff",
+                            border: "none",
+                            borderRadius: "8px",
+                            padding: "0.6rem 1.2rem",
+                            cursor: "pointer",
+                            fontSize: "0.85rem"
+                          }}
+                        >
+                          Done / Close
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={(e) => handleSaveQuestion(e, true)}
+                          disabled={codingStatus.loading}
+                          style={{
+                            background: "rgba(255, 126, 41, 0.15)",
+                            color: "#ff7e29",
+                            border: "1px solid rgba(255, 126, 41, 0.4)",
+                            borderRadius: "8px",
+                            padding: "0.6rem 1.2rem",
+                            fontWeight: 700,
+                            cursor: "pointer",
+                            fontSize: "0.85rem"
+                          }}
+                        >
+                          + Save &amp; Add Another
+                        </button>
+
+                        <button
+                          type="submit"
+                          disabled={codingStatus.loading}
+                          style={{
+                            background: "#10b981",
+                            color: "#fff",
+                            border: "none",
+                            borderRadius: "8px",
+                            padding: "0.6rem 1.4rem",
+                            fontWeight: 700,
+                            cursor: "pointer",
+                            fontSize: "0.85rem",
+                            boxShadow: "0 2px 8px rgba(16, 185, 129, 0.3)"
+                          }}
+                        >
+                          {codingStatus.loading
+                            ? "Saving..."
+                            : selectedQuestionId === "new"
+                            ? (manualQuestionType === "mcq" ? "💾 Save MCQ Question" : "💾 Save Coding Problem")
+                            : "💾 Update Question"}
+                        </button>
+                      </div>
+                    </div>
+                  </form>
                 </div>
-              </form>
+              )}
             </div>
           </div>
         )}

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { apiRequest } from "../../utils/api";
 import { getAdminSession, getFacultySession } from "../../utils/session";
+import CsvQuestionImporter from "../../components/CsvQuestionImporter";
 
 export default function CreateAssignmentPage({ role }) {
   const { courseId } = useParams();
@@ -19,6 +20,7 @@ export default function CreateAssignmentPage({ role }) {
   });
 
   const [questions, setQuestions] = useState([]);
+  const [showCsvImport, setShowCsvImport] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -131,11 +133,37 @@ export default function CreateAssignmentPage({ role }) {
           </div>
         </div>
 
-        <h2 style={{ marginTop: "2rem" }}>Questions</h2>
-        <div style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}>
-          <button type="button" className="auth-button admin-button" onClick={addMcq}>+ Add MCQ</button>
-          <button type="button" className="auth-button faculty-button" onClick={addCoding}>+ Add Coding Question</button>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "2rem", marginBottom: "1rem", flexWrap: "wrap", gap: "0.5rem" }}>
+          <h2 style={{ margin: 0 }}>Questions ({questions.length})</h2>
+          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+            <button type="button" className="auth-button admin-button" onClick={addMcq}>+ Add MCQ Manually</button>
+            <button type="button" className="auth-button faculty-button" onClick={addCoding}>+ Add Coding Question Manually</button>
+            <button
+              type="button"
+              className="auth-button"
+              onClick={() => setShowCsvImport(!showCsvImport)}
+              style={{
+                background: showCsvImport ? "rgba(255, 126, 41, 0.2)" : "rgba(255, 255, 255, 0.08)",
+                color: showCsvImport ? "#ff7e29" : "#fff",
+                border: "1px solid",
+                borderColor: showCsvImport ? "#ff7e29" : "var(--lc-border)"
+              }}
+            >
+              📄 {showCsvImport ? "Close CSV Importer" : "Import from CSV"}
+            </button>
+          </div>
         </div>
+
+        {showCsvImport && (
+          <CsvQuestionImporter
+            onImport={(imported) => {
+              setQuestions([...questions, ...imported]);
+              setShowCsvImport(false);
+            }}
+            targetLabel="Assignment"
+            allowedTypes="all"
+          />
+        )}
 
         {questions.map((q, index) => (
           <div key={q.id} style={{ border: "1px solid #ccc", padding: "1rem", marginBottom: "1rem", borderRadius: "8px" }}>

@@ -3,12 +3,13 @@ import { getAuthMe, loginUser, registerUser } from "../controllers/auth.mongo.co
 import {
   attachRoleProfile,
   requireAuth,
-  requireMongoUser
+  requireMongoUser,
+  requireRole
 } from "../middleware/auth.middleware.js";
 
 const authRouter = Router();
 
-authRouter.post("/register/admin", registerUser);
+authRouter.post("/register/admin", requireAuth, requireRole("admin"), registerUser);
 authRouter.post("/login", loginUser);
 authRouter.get("/me", requireAuth, requireMongoUser, attachRoleProfile, getAuthMe);
 

@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { PlatformLayout, PlatformSection } from "../../components/PlatformLayout/PlatformLayout";
 import { apiRequest } from "../../utils/api";
 import { getStudentSession } from "../../utils/session";
+import { enterFullScreen } from "../../utils/fullscreen";
 
 export default function StudentCourseDetails() {
   const { courseId } = useParams();
@@ -159,6 +160,9 @@ export default function StudentCourseDetails() {
                     <Link
                       className="auth-button student-button detail-link"
                       to={`/student/courses/${courseId}/assignments/${assignment.id}/attempt`}
+                      onClick={() => {
+                        enterFullScreen().catch(() => {});
+                      }}
                       style={{ marginTop: "1rem", display: "inline-block" }}
                     >
                       {assignment.attempt?.status === 'submitted' ? 'View Result' : (assignment.attempt ? 'Continue Assignment' : 'Start Assignment')}

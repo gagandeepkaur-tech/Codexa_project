@@ -87,7 +87,7 @@ function validateCollegeEmail({ email, role, rollNumber, employeeId }) {
 }
 
 export const registerUser = asyncHandler(async (req, res) => {
-  const { role } = req.params;
+  const role = req.params.role || "admin";
   const {
     fullName,
     email,
@@ -102,14 +102,14 @@ export const registerUser = asyncHandler(async (req, res) => {
     designation
   } = req.body;
 
-  if (!["admin", "faculty", "student"].includes(role)) {
-    return res.status(400).json({ message: "Unsupported role." });
-  }
-
-  if (role !== "admin") {
+  if (!req.auth || req.auth.role !== "admin") {
     return res.status(403).json({
       message: `Only admins can create ${role} accounts.`
     });
+  }
+
+  if (!["admin", "faculty", "student"].includes(role)) {
+    return res.status(400).json({ message: "Unsupported role." });
   }
 
   if (!fullName?.trim() || !email?.trim() || !password?.trim()) {

@@ -6,7 +6,8 @@ import {
   submitAttempt,
   getAssignmentRecords,
   getAttemptDetails,
-  getStudentExams
+  getStudentExams,
+  runAssignmentQuestionCode
 } from "../controllers/assignment.controller.js";
 import {
   attachRoleProfile,
@@ -49,6 +50,7 @@ assignmentRouter.get("/:assignmentId", attachCourseId, requireCourseAccess, getA
 assignmentRouter.post("/:assignmentId/start", attachCourseId, requireCourseAccess, startAttempt);
 assignmentRouter.post("/:assignmentId/save-progress", attachCourseId, requireCourseAccess, saveProgress);
 assignmentRouter.post("/:assignmentId/submit", attachCourseId, requireCourseAccess, submitAttempt);
+assignmentRouter.post("/:assignmentId/questions/:questionId/run", attachCourseId, requireCourseAccess, runAssignmentQuestionCode);
 
 assignmentRouter.get("/:assignmentId/attempts", attachCourseId, requireCourseManagementAccess, getAssignmentRecords);
 assignmentRouter.get("/:assignmentId/attempts/:attemptId", attachCourseId, requireCourseAccess, getAttemptDetails);

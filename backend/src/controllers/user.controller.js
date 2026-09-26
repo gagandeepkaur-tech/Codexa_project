@@ -130,7 +130,7 @@ function validateCollegeEmail({ email, role, rollNumber, employeeId }) {
 
 async function registerUser(req, res, next, role, options = {}) {
   const {
-    allowPublicRegistration = role === "admin",
+    allowPublicRegistration = false,
     issueToken = true,
     successMessage = `${role === "admin" ? "Admin" : role === "faculty" ? "Faculty" : "Student"} account created successfully.`
   } = options;
@@ -708,7 +708,9 @@ export function loginStudent(req, res, next) {
 }
 
 export function registerAdmin(req, res, next) {
-  return registerUser(req, res, next, "admin");
+  return registerUser(req, res, next, "admin", {
+    allowPublicRegistration: false
+  });
 }
 
 export function loginAdmin(req, res, next) {
