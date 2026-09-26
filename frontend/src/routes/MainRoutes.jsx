@@ -101,51 +101,62 @@ export default function MainRoutes() {
         <Route path="/login" element={<Login />} />
         <Route path="/student/login" element={<Navigate to="/login" replace />} />
         <Route path="/studentLogin" element={<Navigate to="/login" replace />} />
-        {/* Student Routes */}
-        <Route path="/student/dashboard" element={<StudentDashboard />} />
-        <Route path="/student/courses" element={<StudentCourseList />} />
-        <Route path="/student/courses/:courseId" element={<StudentCourseDetails />} />
-        <Route path="/student/courses/:courseId/problems/:problemId" element={<StudentCourseProblemDetails />} />
-        <Route path="/student/account" element={<StudentAccountPage />} />
-        <Route path="/student/problems" element={<StudentProblemList />} />
-        <Route path="/student/problems/:problemId" element={<StudentProblemDetails />} />
-        <Route path="/student/problems/:problemId/solve" element={<StudentProblemDetails />} />
-        <Route path="/student/exams" element={<StudentExamsPage />} />
-        <Route path="/studentDashboard" element={<StudentDashboard />} />
         <Route path="/faculty/login" element={<Navigate to="/login" replace />} />
-        <Route path="/faculty/dashboard" element={<FacultyDashboard />} />
-        <Route path="/faculty/courses" element={<FacultyCourseList />} />
-        <Route path="/faculty/courses/:courseId" element={<FacultyCourseDetails />} />
-        <Route path="/faculty/courses/:courseId/problems/:problemId" element={<FacultyCourseProblemDetails />} />
-        <Route path="/faculty/students" element={<FacultyStudentList />} />
-        <Route path="/faculty/students/:studentId/submissions" element={<FacultyStudentSubmissions />} />
-        <Route path="/faculty/problems" element={<Navigate to="/faculty/dashboard?tab=practice" replace />} />
-        <Route path="/faculty/problems/:problemId/solve" element={<StudentProblemDetails />} />
-        <Route path="/faculty/exams" element={<FacultyExamsPage />} />
-        <Route path="/faculty/account" element={<FacultyAccountPage />} />
         <Route path="/admin/login" element={<Navigate to="/login" replace />} />
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path="/admin/courses" element={<AdminCourseManager />} />
-        <Route path="/admin/courses/:courseId" element={<AdminCourseDetails />} />
-        <Route path="/admin/courses/:courseId/problems/:problemId" element={<AdminCourseProblemDetails />} />
-        <Route path="/admin/account" element={<AdminAccountPage />} />
-        <Route path="/admin/exams" element={<AdminExamsPage />} />
-        <Route path="/admin/problems/new" element={<AdminProblemCreate />} />
-        <Route path="/admin/problems" element={<AdminProblemList />} />
-        <Route path="/admin/problems/:problemId" element={<AdminProblemDetails />} />
-        <Route path="/admin/problems/:problemId/solve" element={<StudentProblemDetails />} />
-        <Route path="/admin/students" element={<AdminStudentList />} />
-        <Route path="/admin/add-user" element={<AdminAddUser />} />
-        <Route path="/admin/users/add" element={<AdminAddUser />} />
 
-        <Route path="/admin/admins" element={<AdminAdminList />} />
-        <Route path="/admin/faculty" element={<AdminFacultyList />} />
-        <Route path="/admin/students/:studentId/submissions" element={<AdminStudentSubmissions />} />
-        <Route path="/admin/courses/:courseId/assignments/new" element={<CreateAssignmentPage role="admin" />} />
-        <Route path="/faculty/courses/:courseId/assignments/new" element={<CreateAssignmentPage role="faculty" />} />
-        <Route path="/admin/courses/:courseId/assignments/:assignmentId/records" element={<AssignmentRecordsPage role="admin" />} />
-        <Route path="/faculty/courses/:courseId/assignments/:assignmentId/records" element={<AssignmentRecordsPage role="faculty" />} />
-        <Route path="/student/courses/:courseId/assignments/:assignmentId/attempt" element={<AssignmentAttemptPage />} />
+        {/* Student Protected Routes */}
+        <Route element={<ProtectedRoute role="student" />}>
+          <Route path="/student/dashboard" element={<StudentDashboard />} />
+          <Route path="/student/courses" element={<StudentCourseList />} />
+          <Route path="/student/courses/:courseId" element={<StudentCourseDetails />} />
+          <Route path="/student/courses/:courseId/problems/:problemId" element={<StudentCourseProblemDetails />} />
+          <Route path="/student/account" element={<StudentAccountPage />} />
+          <Route path="/student/problems" element={<StudentProblemList />} />
+          <Route path="/student/problems/:problemId" element={<StudentProblemDetails />} />
+          <Route path="/student/problems/:problemId/solve" element={<StudentProblemDetails />} />
+          <Route path="/student/exams" element={<StudentExamsPage />} />
+          <Route path="/studentDashboard" element={<StudentDashboard />} />
+          <Route path="/student/courses/:courseId/assignments/:assignmentId/attempt" element={<AssignmentAttemptPage />} />
+        </Route>
+
+        {/* Faculty Protected Routes */}
+        <Route element={<ProtectedRoute role="faculty" />}>
+          <Route path="/faculty/dashboard" element={<FacultyDashboard />} />
+          <Route path="/faculty/courses" element={<FacultyCourseList />} />
+          <Route path="/faculty/courses/:courseId" element={<FacultyCourseDetails />} />
+          <Route path="/faculty/courses/:courseId/problems/:problemId" element={<FacultyCourseProblemDetails />} />
+          <Route path="/faculty/students" element={<FacultyStudentList />} />
+          <Route path="/faculty/students/:studentId/submissions" element={<FacultyStudentSubmissions />} />
+          <Route path="/faculty/problems" element={<Navigate to="/faculty/dashboard?tab=practice" replace />} />
+          <Route path="/faculty/problems/:problemId/solve" element={<StudentProblemDetails />} />
+          <Route path="/faculty/exams" element={<FacultyExamsPage />} />
+          <Route path="/faculty/account" element={<FacultyAccountPage />} />
+          <Route path="/faculty/courses/:courseId/assignments/new" element={<CreateAssignmentPage role="faculty" />} />
+          <Route path="/faculty/courses/:courseId/assignments/:assignmentId/records" element={<AssignmentRecordsPage role="faculty" />} />
+        </Route>
+
+        {/* Admin Protected Routes */}
+        <Route element={<ProtectedRoute role="admin" />}>
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/courses" element={<AdminCourseManager />} />
+          <Route path="/admin/courses/:courseId" element={<AdminCourseDetails />} />
+          <Route path="/admin/courses/:courseId/problems/:problemId" element={<AdminCourseProblemDetails />} />
+          <Route path="/admin/account" element={<AdminAccountPage />} />
+          <Route path="/admin/exams" element={<AdminExamsPage />} />
+          <Route path="/admin/problems/new" element={<AdminProblemCreate />} />
+          <Route path="/admin/problems" element={<AdminProblemList />} />
+          <Route path="/admin/problems/:problemId" element={<AdminProblemDetails />} />
+          <Route path="/admin/problems/:problemId/solve" element={<StudentProblemDetails />} />
+          <Route path="/admin/students" element={<AdminStudentList />} />
+          <Route path="/admin/add-user" element={<AdminAddUser />} />
+          <Route path="/admin/users/add" element={<AdminAddUser />} />
+          <Route path="/admin/admins" element={<AdminAdminList />} />
+          <Route path="/admin/faculty" element={<AdminFacultyList />} />
+          <Route path="/admin/students/:studentId/submissions" element={<AdminStudentSubmissions />} />
+          <Route path="/admin/courses/:courseId/assignments/new" element={<CreateAssignmentPage role="admin" />} />
+          <Route path="/admin/courses/:courseId/assignments/:assignmentId/records" element={<AssignmentRecordsPage role="admin" />} />
+        </Route>
+
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Suspense>

@@ -2,6 +2,8 @@ import { Router } from "express";
 import {
   addCourseCodingProblem,
   addCourseMaterial,
+  addCourseMcqQuestion,
+  addCourseQuestionsBulk,
   createCourse,
   deleteCourse,
   getCourseById,
@@ -18,6 +20,7 @@ import {
   updateAssignment,
   deleteAssignment,
   addAssignmentQuestion,
+  addAssignmentQuestionsBulk,
   updateAssignmentQuestion,
   deleteAssignmentQuestion
 } from "../controllers/assignment.controller.js";
@@ -47,10 +50,13 @@ courseRouter.post("/:courseId/assignments", requireCourseManagementAccess, creat
 courseRouter.put("/:courseId/assignments/:assignmentId", requireCourseManagementAccess, updateAssignment);
 courseRouter.delete("/:courseId/assignments/:assignmentId", requireCourseManagementAccess, deleteAssignment);
 courseRouter.post("/:courseId/assignments/:assignmentId/questions", requireCourseManagementAccess, addAssignmentQuestion);
+courseRouter.post("/:courseId/assignments/:assignmentId/questions/bulk", requireCourseManagementAccess, addAssignmentQuestionsBulk);
 courseRouter.put("/:courseId/assignments/:assignmentId/questions/:questionId", requireCourseManagementAccess, updateAssignmentQuestion);
 courseRouter.delete("/:courseId/assignments/:assignmentId/questions/:questionId", requireCourseManagementAccess, deleteAssignmentQuestion);
 courseRouter.post("/:courseId/materials", requireCourseManagementAccess, addCourseMaterial);
 courseRouter.post("/:courseId/coding-problems", requireCourseManagementAccess, addCourseCodingProblem);
+courseRouter.post("/:courseId/mcq-questions", requireCourseManagementAccess, addCourseMcqQuestion);
+courseRouter.post("/:courseId/questions/bulk", requireCourseManagementAccess, addCourseQuestionsBulk);
 courseRouter.post("/:courseId/coding-problems/:problemId/run", requireCourseAccess, validateStudentCourseAccess, runCourseCodingProblem);
 courseRouter.post("/:courseId/coding-problems/:problemId/submit", requireCourseAccess, validateStudentCourseAccess, submitCourseCodingProblem);
 

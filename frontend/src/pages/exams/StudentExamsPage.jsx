@@ -3,6 +3,7 @@ import { PlatformLayout } from "../../components/PlatformLayout";
 import CourseAssessmentWorkspace from "../../components/CourseAssessmentWorkspace";
 import { apiRequest } from "../../utils/api";
 import { getStudentSession, getFacultySession, getAdminSession } from "../../utils/session";
+import { enterFullScreen, exitFullScreen } from "../../utils/fullscreen";
 
 export default function StudentExamsPage() {
   const activeSession = getStudentSession();
@@ -17,6 +18,25 @@ export default function StudentExamsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeExam, setActiveExam] = useState(null);
   const [showInstructionsModal, setShowInstructionsModal] = useState(null);
+
+  const handleStartExam = async (exam) => {
+    try {
+      await enterFullScreen();
+    } catch (err) {
+      console.warn("Fullscreen request error:", err);
+    }
+    setActiveExam(exam);
+    setShowInstructionsModal(null);
+  };
+
+  const handleExitExam = async () => {
+    try {
+      await exitFullScreen();
+    } catch (err) {
+      console.warn("Exit fullscreen error:", err);
+    }
+    setActiveExam(null);
+  };
 
   async function loadExamsFromDatabase() {
     setLoading(true);
@@ -78,13 +98,13 @@ export default function StudentExamsPage() {
   if (activeExam) {
     return (
       <PlatformLayout role={userRole} activeItem={`/${userRole}/exams`}>
-        <div style={{ padding: "1rem" }}>
+        <div style={{ padding: "0.5rem" }}>
           <button
-            onClick={() => setActiveExam(null)}
+            onClick={handleExitExam}
             className="lc-submit-btn"
             style={{
               width: "auto",
-              marginBottom: "1rem",
+              marginBottom: "0.75rem",
               background: "rgba(255, 255, 255, 0.08)",
               border: "1px solid var(--lc-border)"
             }}
@@ -99,6 +119,8 @@ export default function StudentExamsPage() {
             assignmentTitle={activeExam.title}
             dueDate={activeExam.endTime}
             lastSubmission={activeExam.submittedAt || "In Progress..."}
+            initialFullScreen={true}
+            onExitExam={handleExitExam}
           />
         </div>
       </PlatformLayout>
@@ -429,7 +451,7 @@ export default function StudentExamsPage() {
                   <div style={{ display: "flex", gap: "0.75rem", marginTop: "0.5rem" }}>
                     {exam.status === "live" ? (
                       <button
-                        onClick={() => setActiveExam(exam)}
+                        onClick={() => handleStartExam(exam)}
                         style={{
                           flex: 1,
                           background: "#10b981",
@@ -439,15 +461,20 @@ export default function StudentExamsPage() {
                           padding: "0.65rem",
                           fontWeight: 700,
                           fontSize: "0.85rem",
-                          cursor: "pointer"
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: "0.4rem"
                         }}
                       >
-                        Start Exam Now →
+                        <span>Start Exam Now</span>
+                        <span style={{ fontSize: "1rem" }}>⛶</span>
                       </button>
                     ) : exam.status === "upcoming" ? (
                       <button
                         disabled={!isStartTimeReached}
-                        onClick={() => isStartTimeReached && setActiveExam(exam)}
+                        onClick={() => isStartTimeReached && handleStartExam(exam)}
                         style={{
                           flex: 1,
                           background: isStartTimeReached ? "#3b82f6" : "rgba(255, 255, 255, 0.05)",
@@ -457,14 +484,23 @@ export default function StudentExamsPage() {
                           padding: "0.65rem",
                           fontWeight: 600,
                           fontSize: "0.85rem",
-                          cursor: isStartTimeReached ? "pointer" : "not-allowed"
+                          cursor: isStartTimeReached ? "pointer" : "not-allowed",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: "0.4rem"
                         }}
                       >
-                        {isStartTimeReached ? "Start Exam →" : `Opens on ${exam.startTime}`}
+                        {isStartTimeReached ? (
+                          <>
+                            <span>Start Exam</span>
+                            <span style={{ fontSize: "1rem" }}>⛶</span>
+                          </>
+                        ) : `Opens on ${exam.startTime}`}
                       </button>
                     ) : (
                       <button
-                        onClick={() => setActiveExam(exam)}
+                        onClick={() => handleStartExam(exam)}
                         style={{
                           flex: 1,
                           background: "rgba(255, 255, 255, 0.08)",
@@ -474,10 +510,15 @@ export default function StudentExamsPage() {
                           padding: "0.65rem",
                           fontWeight: 600,
                           fontSize: "0.85rem",
-                          cursor: "pointer"
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: "0.4rem"
                         }}
                       >
-                        Review Paper
+                        <span>Review Paper</span>
+                        <span>⛶</span>
                       </button>
                     )}
 
@@ -547,6 +588,9 @@ export default function StudentExamsPage() {
                   {showInstructionsModal.instructions?.map((inst, idx) => (
                     <li key={idx} style={{ marginBottom: "0.4rem" }}>{inst}</li>
                   ))}
+                  <li style={{ color: "#38bdf8", fontWeight: 600, marginTop: "0.5rem" }}>
+                    ℹ️ When you start, this exam opens automatically in full screen mode.
+                  </li>
                 </ul>
               </div>
 
@@ -565,6 +609,27 @@ export default function StudentExamsPage() {
                 >
                   Close
                 </button>
+                {showInstructionsModal.status === "live" ? (
+                  <button
+                    onClick={() => handleStartExam(showInstructionsModal)}
+                    style={{
+                      background: "#10b981",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: "8px",
+                      padding: "0.6rem 1.25rem",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      fontSize: "0.85rem",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.4rem"
+                    }}
+                  >
+                    <span>Start Exam in Full Screen</span>
+                    <span>⛶</span>
+                  </button>
+                ) : null}
               </div>
             </div>
           </div>

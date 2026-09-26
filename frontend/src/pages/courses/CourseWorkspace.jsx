@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { PlatformLayout, PlatformSection, PlatformStats } from "../../components/PlatformLayout";
 import { apiRequest } from "../../utils/api";
+import CsvQuestionImporter from "../../components/CsvQuestionImporter";
 
 const initialAssignmentForm = {
   title: "",
@@ -71,6 +72,17 @@ export default function CourseWorkspace({ role, session }) {
     success: "",
     error: ""
   });
+  const [questionAddMode, setQuestionAddMode] = useState("manual"); // "manual" | "csv"
+  const [manualQuestionType, setManualQuestionType] = useState("coding"); // "coding" | "mcq"
+  const [mcqForm, setMcqForm] = useState({
+    questionText: "",
+    options: ["", "", "", ""],
+    correctOptionIndex: 0,
+    marks: 1,
+    negativeMarks: 0
+  });
+  const [isBulkImporting, setIsBulkImporting] = useState(false);
+  const [practiceFilter, setPracticeFilter] = useState("all");
 
   const isAdmin = role === "admin";
   const isFaculty = role === "faculty";
@@ -199,6 +211,73 @@ export default function CourseWorkspace({ role, session }) {
         success: "",
         error: error.message
       });
+    }
+  }
+
+  async function handleCreateMcq(event) {
+    event.preventDefault();
+    if (!mcqForm.questionText.trim()) {
+      setActionStatus({ success: "", error: "Question text is required." });
+      return;
+    }
+    try {
+      await apiRequest(
+        `/courses/${courseId}/mcq-questions`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            questionText: mcqForm.questionText.trim(),
+            options: mcqForm.options.map((opt) => opt.trim()),
+            correctOptionIndex: Number(mcqForm.correctOptionIndex) || 0,
+            marks: Number(mcqForm.marks) || 1,
+            negativeMarks: Number(mcqForm.negativeMarks) || 0
+          })
+        },
+        session?.token
+      );
+      setMcqForm({
+        questionText: "",
+        options: ["", "", "", ""],
+        correctOptionIndex: 0,
+        marks: 1,
+        negativeMarks: 0
+      });
+      setActionStatus({
+        success: "MCQ question added to course question bank successfully.",
+        error: ""
+      });
+      loadCourse();
+    } catch (error) {
+      setActionStatus({
+        success: "",
+        error: error.message
+      });
+    }
+  }
+
+  async function handleBulkImportCourseQuestions(parsedQuestions) {
+    setIsBulkImporting(true);
+    try {
+      const res = await apiRequest(
+        `/courses/${courseId}/questions/bulk`,
+        {
+          method: "POST",
+          body: JSON.stringify({ questions: parsedQuestions })
+        },
+        session?.token
+      );
+      setActionStatus({
+        success: res.message || `Successfully imported ${parsedQuestions.length} questions into course!`,
+        error: ""
+      });
+      loadCourse();
+    } catch (error) {
+      setActionStatus({
+        success: "",
+        error: error.message || "Failed to import questions."
+      });
+    } finally {
+      setIsBulkImporting(false);
     }
   }
 
@@ -532,14 +611,49 @@ export default function CourseWorkspace({ role, session }) {
             ) : null}
           </PlatformSection>
 
-          <PlatformSection label="Practice" title={isFaculty ? "Coding practice studio" : "Course question bank"}>
-            {data.codingProblems.length === 0 ? <p className="dashboard-copy">No course coding problems yet.</p> : null}
-            {data.codingProblems.length > 0 ? (
-              <div className="history-list">
-                {data.codingProblems.map((problem) => (
+          <PlatformSection label="Practice" title={isFaculty ? "Course question bank & practice studio" : "Course question bank"}>
+            {/* Filter pills */}
+            <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem", flexWrap: "wrap" }}>
+              <button
+                type="button"
+                className={`platform-tab ${practiceFilter === "all" ? "active" : ""}`}
+                style={{ padding: "0.3rem 0.8rem", fontSize: "0.8rem" }}
+                onClick={() => setPracticeFilter("all")}
+              >
+                All Questions ({(data.codingProblems?.length || 0) + (data.mcqQuestions?.length || 0)})
+              </button>
+              <button
+                type="button"
+                className={`platform-tab ${practiceFilter === "coding" ? "active" : ""}`}
+                style={{ padding: "0.3rem 0.8rem", fontSize: "0.8rem" }}
+                onClick={() => setPracticeFilter("coding")}
+              >
+                💻 Coding Problems ({data.codingProblems?.length || 0})
+              </button>
+              <button
+                type="button"
+                className={`platform-tab ${practiceFilter === "mcq" ? "active" : ""}`}
+                style={{ padding: "0.3rem 0.8rem", fontSize: "0.8rem" }}
+                onClick={() => setPracticeFilter("mcq")}
+              >
+                🔘 MCQs ({data.mcqQuestions?.length || 0})
+              </button>
+            </div>
+
+            {(!data.codingProblems || data.codingProblems.length === 0) && (!data.mcqQuestions || data.mcqQuestions.length === 0) ? (
+              <p className="dashboard-copy">No course questions yet. Use the Add Question section below to add questions manually or import via CSV.</p>
+            ) : null}
+
+            <div className="history-list">
+              {/* Coding Problems */}
+              {(practiceFilter === "all" || practiceFilter === "coding") &&
+                data.codingProblems?.map((problem) => (
                   <article className="history-card faculty-list-card" key={problem.id}>
                     <div className="question-card-top">
                       <span className={`difficulty-pill ${problem.difficulty}`}>{problem.difficulty}</span>
+                      <span style={{ fontSize: "0.75rem", background: "rgba(16, 185, 129, 0.15)", color: "#10b981", padding: "0.15rem 0.5rem", borderRadius: "4px", fontWeight: 700 }}>
+                        CODING
+                      </span>
                     </div>
                     <strong>{problem.title}</strong>
                     <p>{problem.statement}</p>
@@ -554,8 +668,43 @@ export default function CourseWorkspace({ role, session }) {
                     </Link>
                   </article>
                 ))}
-              </div>
-            ) : null}
+
+              {/* MCQ Questions */}
+              {(practiceFilter === "all" || practiceFilter === "mcq") &&
+                data.mcqQuestions?.map((mcq, idx) => (
+                  <article className="history-card faculty-list-card" key={mcq.id || idx}>
+                    <div className="question-card-top">
+                      <span style={{ fontSize: "0.75rem", background: "rgba(56, 189, 248, 0.15)", color: "#38bdf8", padding: "0.15rem 0.5rem", borderRadius: "4px", fontWeight: 700 }}>
+                        MCQ ({mcq.marks || 1} pts)
+                      </span>
+                      {mcq.negative_marks > 0 ? (
+                        <span style={{ fontSize: "0.7rem", color: "#f87171" }}>
+                          -{mcq.negative_marks} neg
+                        </span>
+                      ) : null}
+                    </div>
+                    <strong>{mcq.question_text}</strong>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.4rem", marginTop: "0.6rem" }}>
+                      {(Array.isArray(mcq.options) ? mcq.options : []).map((opt, oIdx) => (
+                        <div
+                          key={oIdx}
+                          style={{
+                            padding: "0.4rem 0.6rem",
+                            borderRadius: "6px",
+                            fontSize: "0.8rem",
+                            background: (isAdmin || isFaculty) && mcq.correct_option_index === oIdx ? "rgba(16, 185, 129, 0.18)" : "rgba(255, 255, 255, 0.04)",
+                            border: "1px solid",
+                            borderColor: (isAdmin || isFaculty) && mcq.correct_option_index === oIdx ? "#10b981" : "var(--lc-border)",
+                            color: (isAdmin || isFaculty) && mcq.correct_option_index === oIdx ? "#10b981" : "var(--lc-text-primary)"
+                          }}
+                        >
+                          <strong>{String.fromCharCode(65 + oIdx)}.</strong> {opt} {(isAdmin || isFaculty) && mcq.correct_option_index === oIdx ? "✓ (Correct)" : ""}
+                        </div>
+                      ))}
+                    </div>
+                  </article>
+                ))}
+            </div>
           </PlatformSection>
 
           {isFaculty ? (
@@ -622,156 +771,370 @@ export default function CourseWorkspace({ role, session }) {
             </form>
           </PlatformSection>
 
-          <PlatformSection label="Add Question" title="Add a coding question to this course">
-            <form className="auth-form course-form-grid" onSubmit={handleCreateProblem}>
-              <input
-                placeholder="Problem title"
-                value={problemForm.title}
-                onChange={(event) => setProblemForm((current) => ({ ...current, title: event.target.value }))}
-                required
-              />
-              <select
-                value={problemForm.difficulty}
-                onChange={(event) => setProblemForm((current) => ({ ...current, difficulty: event.target.value }))}
+          <PlatformSection label="Add Question" title="Add questions to this course">
+            {/* Mode Switcher: Manual vs CSV */}
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "0.5rem",
+              marginBottom: "1.25rem",
+              background: "rgba(255, 255, 255, 0.04)",
+              padding: "0.35rem",
+              borderRadius: "10px",
+              border: "1px solid var(--lc-border)"
+            }}>
+              <button
+                type="button"
+                onClick={() => setQuestionAddMode("manual")}
+                style={{
+                  padding: "0.55rem 1rem",
+                  borderRadius: "8px",
+                  fontSize: "0.85rem",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  border: "none",
+                  background: questionAddMode === "manual" ? "var(--lc-accent, #ff7e29)" : "transparent",
+                  color: questionAddMode === "manual" ? "#fff" : "var(--lc-text-muted)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "0.45rem",
+                  transition: "all 0.15s ease"
+                }}
               >
-                <option value="easy">Easy</option>
-                <option value="medium">Medium</option>
-                <option value="hard">Hard</option>
-              </select>
-              <textarea
-                rows="6"
-                placeholder="Problem statement"
-                value={problemForm.statement}
-                onChange={(event) => setProblemForm((current) => ({ ...current, statement: event.target.value }))}
-                required
-              />
-              <textarea
-                rows="4"
-                placeholder="Input format"
-                value={problemForm.inputFormat}
-                onChange={(event) => setProblemForm((current) => ({ ...current, inputFormat: event.target.value }))}
-              />
-              <textarea
-                rows="4"
-                placeholder="Output format"
-                value={problemForm.outputFormat}
-                onChange={(event) => setProblemForm((current) => ({ ...current, outputFormat: event.target.value }))}
-              />
-              <textarea
-                rows="4"
-                placeholder="Constraints"
-                value={problemForm.constraintsText}
-                onChange={(event) => setProblemForm((current) => ({ ...current, constraintsText: event.target.value }))}
-              />
-              <textarea
-                rows="4"
-                placeholder="Examples or walkthrough"
-                value={problemForm.examplesText}
-                onChange={(event) => setProblemForm((current) => ({ ...current, examplesText: event.target.value }))}
-              />
-
-              <div className="history-card">
-                <strong>Sample Test Cases</strong>
-                <p className="question-meta">These are visible to students and used by the Run Code action.</p>
-                {sampleTestCases.map((testCase, index) => (
-                  <div className="course-test-case-grid" key={`sample-${index}`}>
-                    <textarea
-                      rows="4"
-                      placeholder={`Sample input #${index + 1}`}
-                      value={testCase.input_data}
-                      onChange={(event) =>
-                        setSampleTestCases((current) =>
-                          current.map((entry, entryIndex) =>
-                            entryIndex === index ? { ...entry, input_data: event.target.value } : entry
-                          )
-                        )
-                      }
-                    />
-                    <textarea
-                      rows="4"
-                      placeholder={`Expected output #${index + 1}`}
-                      value={testCase.expected_output}
-                      onChange={(event) =>
-                        setSampleTestCases((current) =>
-                          current.map((entry, entryIndex) =>
-                            entryIndex === index ? { ...entry, expected_output: event.target.value } : entry
-                          )
-                        )
-                      }
-                    />
-                    {sampleTestCases.length > 1 ? (
-                      <button
-                        className={`auth-button ${accentButtonClass}`}
-                        type="button"
-                        onClick={() => setSampleTestCases((current) => current.filter((_, entryIndex) => entryIndex !== index))}
-                      >
-                        Remove sample
-                      </button>
-                    ) : null}
-                  </div>
-                ))}
-                <button
-                  className={`auth-button ${accentButtonClass}`}
-                  type="button"
-                  onClick={() => setSampleTestCases((current) => [...current, { ...blankTestCase }])}
-                >
-                  Add sample test case
-                </button>
-              </div>
-
-              <div className="history-card">
-                <strong>Hidden Test Cases</strong>
-                <p className="question-meta">These are checked during final submission and are not shown to students.</p>
-                {hiddenTestCases.map((testCase, index) => (
-                  <div className="course-test-case-grid" key={`hidden-${index}`}>
-                    <textarea
-                      rows="4"
-                      placeholder={`Hidden input #${index + 1}`}
-                      value={testCase.input_data}
-                      onChange={(event) =>
-                        setHiddenTestCases((current) =>
-                          current.map((entry, entryIndex) =>
-                            entryIndex === index ? { ...entry, input_data: event.target.value } : entry
-                          )
-                        )
-                      }
-                    />
-                    <textarea
-                      rows="4"
-                      placeholder={`Expected output #${index + 1}`}
-                      value={testCase.expected_output}
-                      onChange={(event) =>
-                        setHiddenTestCases((current) =>
-                          current.map((entry, entryIndex) =>
-                            entryIndex === index ? { ...entry, expected_output: event.target.value } : entry
-                          )
-                        )
-                      }
-                    />
-                    {hiddenTestCases.length > 1 ? (
-                      <button
-                        className={`auth-button ${accentButtonClass}`}
-                        type="button"
-                        onClick={() => setHiddenTestCases((current) => current.filter((_, entryIndex) => entryIndex !== index))}
-                      >
-                        Remove hidden
-                      </button>
-                    ) : null}
-                  </div>
-                ))}
-                <button
-                  className={`auth-button ${accentButtonClass}`}
-                  type="button"
-                  onClick={() => setHiddenTestCases((current) => [...current, { ...blankTestCase }])}
-                >
-                  Add hidden test case
-                </button>
-              </div>
-
-              <button className={`auth-button ${accentButtonClass}`} type="submit">
-                Add coding question
+                <span>✍️</span>
+                <span>Add Question Manually</span>
               </button>
-            </form>
+              <button
+                type="button"
+                onClick={() => setQuestionAddMode("csv")}
+                style={{
+                  padding: "0.55rem 1rem",
+                  borderRadius: "8px",
+                  fontSize: "0.85rem",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  border: "none",
+                  background: questionAddMode === "csv" ? "var(--lc-accent, #ff7e29)" : "transparent",
+                  color: questionAddMode === "csv" ? "#fff" : "var(--lc-text-muted)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "0.45rem",
+                  transition: "all 0.15s ease"
+                }}
+              >
+                <span>📄</span>
+                <span>Import via CSV File</span>
+              </button>
+            </div>
+
+            {/* CSV Import Mode */}
+            {questionAddMode === "csv" ? (
+              <CsvQuestionImporter
+                onImport={handleBulkImportCourseQuestions}
+                targetLabel={data.title || "Course"}
+                isSubmitting={isBulkImporting}
+                allowedTypes="all"
+              />
+            ) : (
+              /* Manual Mode */
+              <div>
+                {/* Manual Question Type Selector: Coding Problem vs MCQ */}
+                <div style={{ display: "flex", gap: "0.75rem", marginBottom: "1.25rem" }}>
+                  <button
+                    type="button"
+                    onClick={() => setManualQuestionType("coding")}
+                    style={{
+                      flex: 1,
+                      padding: "0.6rem",
+                      borderRadius: "8px",
+                      border: "1px solid",
+                      borderColor: manualQuestionType === "coding" ? "#10b981" : "var(--lc-border)",
+                      background: manualQuestionType === "coding" ? "rgba(16, 185, 129, 0.15)" : "rgba(255, 255, 255, 0.03)",
+                      color: manualQuestionType === "coding" ? "#10b981" : "var(--lc-text-muted)",
+                      fontWeight: 700,
+                      fontSize: "0.85rem",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "0.4rem"
+                    }}
+                  >
+                    <span>💻 Coding Problem</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setManualQuestionType("mcq")}
+                    style={{
+                      flex: 1,
+                      padding: "0.6rem",
+                      borderRadius: "8px",
+                      border: "1px solid",
+                      borderColor: manualQuestionType === "mcq" ? "#38bdf8" : "var(--lc-border)",
+                      background: manualQuestionType === "mcq" ? "rgba(56, 189, 248, 0.15)" : "rgba(255, 255, 255, 0.03)",
+                      color: manualQuestionType === "mcq" ? "#38bdf8" : "var(--lc-text-muted)",
+                      fontWeight: 700,
+                      fontSize: "0.85rem",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "0.4rem"
+                    }}
+                  >
+                    <span>🔘 Multiple Choice (MCQ)</span>
+                  </button>
+                </div>
+
+                {manualQuestionType === "coding" ? (
+                  <form className="auth-form course-form-grid" onSubmit={handleCreateProblem}>
+                    <input
+                      placeholder="Problem title"
+                      value={problemForm.title}
+                      onChange={(event) => setProblemForm((current) => ({ ...current, title: event.target.value }))}
+                      required
+                    />
+                    <select
+                      value={problemForm.difficulty}
+                      onChange={(event) => setProblemForm((current) => ({ ...current, difficulty: event.target.value }))}
+                    >
+                      <option value="easy">Easy</option>
+                      <option value="medium">Medium</option>
+                      <option value="hard">Hard</option>
+                    </select>
+                    <textarea
+                      rows="6"
+                      placeholder="Problem statement"
+                      value={problemForm.statement}
+                      onChange={(event) => setProblemForm((current) => ({ ...current, statement: event.target.value }))}
+                      required
+                    />
+                    <textarea
+                      rows="4"
+                      placeholder="Input format"
+                      value={problemForm.inputFormat}
+                      onChange={(event) => setProblemForm((current) => ({ ...current, inputFormat: event.target.value }))}
+                    />
+                    <textarea
+                      rows="4"
+                      placeholder="Output format"
+                      value={problemForm.outputFormat}
+                      onChange={(event) => setProblemForm((current) => ({ ...current, outputFormat: event.target.value }))}
+                    />
+                    <textarea
+                      rows="4"
+                      placeholder="Constraints"
+                      value={problemForm.constraintsText}
+                      onChange={(event) => setProblemForm((current) => ({ ...current, constraintsText: event.target.value }))}
+                    />
+                    <textarea
+                      rows="4"
+                      placeholder="Examples or walkthrough"
+                      value={problemForm.examplesText}
+                      onChange={(event) => setProblemForm((current) => ({ ...current, examplesText: event.target.value }))}
+                    />
+
+                    <div className="history-card">
+                      <strong>Sample Test Cases</strong>
+                      <p className="question-meta">These are visible to students and used by the Run Code action.</p>
+                      {sampleTestCases.map((testCase, index) => (
+                        <div className="course-test-case-grid" key={`sample-${index}`}>
+                          <textarea
+                            rows="4"
+                            placeholder={`Sample input #${index + 1}`}
+                            value={testCase.input_data}
+                            onChange={(event) =>
+                              setSampleTestCases((current) =>
+                                current.map((entry, entryIndex) =>
+                                  entryIndex === index ? { ...entry, input_data: event.target.value } : entry
+                                )
+                              )
+                            }
+                          />
+                          <textarea
+                            rows="4"
+                            placeholder={`Expected output #${index + 1}`}
+                            value={testCase.expected_output}
+                            onChange={(event) =>
+                              setSampleTestCases((current) =>
+                                current.map((entry, entryIndex) =>
+                                  entryIndex === index ? { ...entry, expected_output: event.target.value } : entry
+                                )
+                              )
+                            }
+                          />
+                          {sampleTestCases.length > 1 ? (
+                            <button
+                              className={`auth-button ${accentButtonClass}`}
+                              type="button"
+                              onClick={() => setSampleTestCases((current) => current.filter((_, entryIndex) => entryIndex !== index))}
+                            >
+                              Remove sample
+                            </button>
+                          ) : null}
+                        </div>
+                      ))}
+                      <button
+                        className={`auth-button ${accentButtonClass}`}
+                        type="button"
+                        onClick={() => setSampleTestCases((current) => [...current, { ...blankTestCase }])}
+                      >
+                        Add sample test case
+                      </button>
+                    </div>
+
+                    <div className="history-card">
+                      <strong>Hidden Test Cases</strong>
+                      <p className="question-meta">These are checked during final submission and are not shown to students.</p>
+                      {hiddenTestCases.map((testCase, index) => (
+                        <div className="course-test-case-grid" key={`hidden-${index}`}>
+                          <textarea
+                            rows="4"
+                            placeholder={`Hidden input #${index + 1}`}
+                            value={testCase.input_data}
+                            onChange={(event) =>
+                              setHiddenTestCases((current) =>
+                                current.map((entry, entryIndex) =>
+                                  entryIndex === index ? { ...entry, input_data: event.target.value } : entry
+                                )
+                              )
+                            }
+                          />
+                          <textarea
+                            rows="4"
+                            placeholder={`Expected output #${index + 1}`}
+                            value={testCase.expected_output}
+                            onChange={(event) =>
+                              setHiddenTestCases((current) =>
+                                current.map((entry, entryIndex) =>
+                                  entryIndex === index ? { ...entry, expected_output: event.target.value } : entry
+                                )
+                              )
+                            }
+                          />
+                          {hiddenTestCases.length > 1 ? (
+                            <button
+                              className={`auth-button ${accentButtonClass}`}
+                              type="button"
+                              onClick={() => setHiddenTestCases((current) => current.filter((_, entryIndex) => entryIndex !== index))}
+                            >
+                              Remove hidden
+                            </button>
+                          ) : null}
+                        </div>
+                      ))}
+                      <button
+                        className={`auth-button ${accentButtonClass}`}
+                        type="button"
+                        onClick={() => setHiddenTestCases((current) => [...current, { ...blankTestCase }])}
+                      >
+                        Add hidden test case
+                      </button>
+                    </div>
+
+                    <button className={`auth-button ${accentButtonClass}`} type="submit">
+                      Add coding question
+                    </button>
+                  </form>
+                ) : (
+                  <form className="auth-form course-form-grid" onSubmit={handleCreateMcq}>
+                    <textarea
+                      rows="4"
+                      placeholder="MCQ Question Prompt / Statement"
+                      value={mcqForm.questionText}
+                      onChange={(e) => setMcqForm({ ...mcqForm, questionText: e.target.value })}
+                      required
+                    />
+
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                      <div>
+                        <label className="auth-label" style={{ fontSize: "0.8rem" }}>Marks</label>
+                        <input
+                          type="number"
+                          min="1"
+                          max="100"
+                          value={mcqForm.marks}
+                          onChange={(e) => setMcqForm({ ...mcqForm, marks: Number(e.target.value) })}
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="auth-label" style={{ fontSize: "0.8rem" }}>Negative Marks</label>
+                        <input
+                          type="number"
+                          min="0"
+                          max="50"
+                          value={mcqForm.negativeMarks}
+                          onChange={(e) => setMcqForm({ ...mcqForm, negativeMarks: Number(e.target.value) })}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="history-card" style={{ gridColumn: "1 / -1" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
+                        <strong>Options (Select the correct answer)</strong>
+                        <button
+                          type="button"
+                          className={`auth-button ${accentButtonClass}`}
+                          style={{ padding: "0.3rem 0.7rem", fontSize: "0.75rem" }}
+                          onClick={() => setMcqForm({ ...mcqForm, options: [...mcqForm.options, ""] })}
+                        >
+                          + Add Option
+                        </button>
+                      </div>
+
+                      <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
+                        {mcqForm.options.map((opt, oIdx) => (
+                          <div key={oIdx} style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                            <label style={{ display: "flex", alignItems: "center", gap: "0.4rem", cursor: "pointer", minWidth: "90px", fontWeight: 700 }}>
+                              <input
+                                type="radio"
+                                name="courseMcqCorrect"
+                                checked={mcqForm.correctOptionIndex === oIdx}
+                                onChange={() => setMcqForm({ ...mcqForm, correctOptionIndex: oIdx })}
+                                style={{ accentColor: "#10b981", cursor: "pointer" }}
+                              />
+                              <span>{String.fromCharCode(65 + oIdx)} {mcqForm.correctOptionIndex === oIdx ? "✓" : ""}</span>
+                            </label>
+                            <input
+                              type="text"
+                              placeholder={`Option ${String.fromCharCode(65 + oIdx)} text`}
+                              value={opt}
+                              onChange={(e) => {
+                                const next = [...mcqForm.options];
+                                next[oIdx] = e.target.value;
+                                setMcqForm({ ...mcqForm, options: next });
+                              }}
+                              required
+                              style={{ margin: 0, flex: 1 }}
+                            />
+                            {mcqForm.options.length > 2 && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const next = mcqForm.options.filter((_, idx) => idx !== oIdx);
+                                  const nextCorrect = mcqForm.correctOptionIndex >= next.length ? 0 : mcqForm.correctOptionIndex;
+                                  setMcqForm({ ...mcqForm, options: next, correctOptionIndex: nextCorrect });
+                                }}
+                                style={{ background: "rgba(239, 68, 68, 0.15)", color: "#f87171", border: "none", borderRadius: "6px", padding: "0.5rem 0.7rem", cursor: "pointer" }}
+                              >
+                                ✕
+                              </button>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <button className={`auth-button ${accentButtonClass}`} type="submit">
+                      Add MCQ Question to Course Bank
+                    </button>
+                  </form>
+                )}
+              </div>
+            )}
           </PlatformSection>
             </>
           )}

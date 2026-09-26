@@ -772,11 +772,22 @@ export const getCourseById = asyncHandler(async (req, res) => {
       }));
     }
 
+    const mcqResult = await client.query(
+      `
+        SELECT id, question_text, options, correct_option_index, marks, negative_marks, created_at
+        FROM mcq_questions
+        WHERE course_id = $1
+        ORDER BY created_at DESC
+      `,
+      [req.course.id]
+    );
+
     res.json({
       course: {
         ...courseCard,
         materials: materialsResult.rows,
         codingProblems,
+        mcqQuestions: mcqResult.rows,
         assignments,
         students
       }
@@ -871,6 +882,114 @@ export const addCourseCodingProblem = asyncHandler(async (req, res) => {
   res.status(201).json({ message: "Coding problem created successfully." });
 });
 
+export const addCourseMcqQuestion = asyncHandler(async (req, res) => {
+  const { questionText, options, correctOptionIndex = 0, marks = 1, negativeMarks = 0 } = req.body;
+
+  if (!questionText?.trim()) {
+    return res.status(400).json({ message: "Question text is required." });
+  }
+
+  const client = await pool.connect();
+  try {
+    const result = await client.query(
+      `INSERT INTO mcq_questions (course_id, question_text, options, correct_option_index, marks, negative_marks)
+       VALUES ($1, $2, $3, $4, $5, $6)
+       RETURNING id, question_text, options, correct_option_index, marks, negative_marks, created_at`,
+      [
+        req.course.id,
+        questionText.trim(),
+        JSON.stringify(Array.isArray(options) ? options : ["Option 1", "Option 2", "Option 3", "Option 4"]),
+        typeof correctOptionIndex === "number" ? correctOptionIndex : 0,
+        Number(marks) || 1,
+        Number(negativeMarks) || 0
+      ]
+    );
+
+    res.status(201).json({
+      message: "MCQ question created successfully.",
+      question: result.rows[0]
+    });
+  } finally {
+    client.release();
+  }
+});
+
+export const addCourseQuestionsBulk = asyncHandler(async (req, res) => {
+  const { questions } = req.body;
+
+  if (!Array.isArray(questions) || questions.length === 0) {
+    return res.status(400).json({ message: "An array of questions is required." });
+  }
+
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    const inserted = [];
+
+    for (const q of questions) {
+      if (q.type === "mcq") {
+        const mcqResult = await client.query(
+          `INSERT INTO mcq_questions (course_id, question_text, options, correct_option_index, marks, negative_marks)
+           VALUES ($1, $2, $3, $4, $5, $6)
+           RETURNING id, question_text, options, correct_option_index, marks, negative_marks, created_at`,
+          [
+            req.course.id,
+            q.questionText || q.title || "MCQ Question",
+            JSON.stringify(Array.isArray(q.options) ? q.options : ["Option 1", "Option 2", "Option 3", "Option 4"]),
+            typeof q.correctOptionIndex === "number" ? q.correctOptionIndex : 0,
+            Number(q.marks) || 1,
+            Number(q.negativeMarks) || 0
+          ]
+        );
+        inserted.push({ type: "mcq", ...mcqResult.rows[0] });
+      } else {
+        const codingResult = await client.query(
+          `INSERT INTO course_coding_problems (course_id, title, statement, input_format, output_format, constraints_text, examples_text, difficulty, created_by)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+           RETURNING id, title, statement, difficulty`,
+          [
+            req.course.id,
+            q.title?.trim() || "Coding Problem",
+            q.statement?.trim() || q.description?.trim() || "",
+            q.inputFormat?.trim() || null,
+            q.outputFormat?.trim() || null,
+            q.constraintsText?.trim() || null,
+            q.examplesText?.trim() || null,
+            q.difficulty?.trim()?.toLowerCase() || "medium",
+            req.currentUser.id
+          ]
+        );
+        const problemId = codingResult.rows[0].id;
+
+        const sampleCases = Array.isArray(q.sampleTestCases) && q.sampleTestCases.length > 0
+          ? normalizeCourseProblemTestCases(q.sampleTestCases)
+          : (q.sampleInput ? normalizeCourseProblemTestCases([{ input_data: q.sampleInput, expected_output: q.sampleOutput || "" }]) : []);
+
+        const hiddenCases = Array.isArray(q.hiddenTestCases) && q.hiddenTestCases.length > 0
+          ? normalizeCourseProblemTestCases(q.hiddenTestCases)
+          : (q.hiddenInput ? normalizeCourseProblemTestCases([{ input_data: q.hiddenInput, expected_output: q.hiddenOutput || "" }]) : []);
+
+        await replaceCourseProblemTestCases(client, problemId, sampleCases, true);
+        await replaceCourseProblemTestCases(client, problemId, hiddenCases, false);
+
+        inserted.push({ type: "coding", ...codingResult.rows[0] });
+      }
+    }
+
+    await client.query("COMMIT");
+    res.status(201).json({
+      message: `Successfully imported ${inserted.length} questions into course.`,
+      count: inserted.length,
+      questions: inserted
+    });
+  } catch (err) {
+    await client.query("ROLLBACK");
+    throw err;
+  } finally {
+    client.release();
+  }
+});
+
 export const runCourseCodingProblem = asyncHandler(async (req, res) => {
   const payload = normalizeCourseProblemExecutionPayload(req.body);
 
@@ -892,6 +1011,16 @@ export const runCourseCodingProblem = asyncHandler(async (req, res) => {
   if (problemResult.rows.length === 0) {
     return res.status(404).json({ message: "Course coding problem not found." });
   }
+
+  const sampleTestCaseResult = await pool.query(
+    `
+      SELECT id, input_data, expected_output, is_sample, sort_order
+      FROM course_problem_test_cases
+      WHERE course_problem_id = $1 AND is_sample = true
+      ORDER BY sort_order ASC, created_at ASC
+    `,
+    [req.params.problemId]
+  );
 
   let testCasesToRun = sampleTestCaseResult.rows;
 

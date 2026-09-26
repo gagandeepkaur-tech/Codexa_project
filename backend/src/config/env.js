@@ -28,7 +28,7 @@ function parseClientUrls(value) {
 
 export const env = {
   port: Number(process.env.PORT) || 5000,
-  clientUrls: parseClientUrls(process.env.CLIENT_URL),
+  clientUrls: parseClientUrls(process.env.CLIENT_URL || process.env.CLIENT_URLS),
   collegeEmailDomain: (process.env.COLLEGE_EMAIL_DOMAIN || "college.com").trim().toLowerCase(),
   databaseUrl:
     process.env.DATABASE_URL ||

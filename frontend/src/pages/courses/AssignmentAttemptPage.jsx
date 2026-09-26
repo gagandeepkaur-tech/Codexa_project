@@ -2,6 +2,13 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { apiRequest } from "../../utils/api";
 import { getStudentSession } from "../../utils/session";
+import {
+  enterFullScreen,
+  exitFullScreen,
+  toggleFullScreen,
+  isFullscreenActive,
+  subscribeToFullscreenChange
+} from "../../utils/fullscreen";
 
 export default function AssignmentAttemptPage() {
   const { courseId, assignmentId } = useParams();
@@ -15,6 +22,17 @@ export default function AssignmentAttemptPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [isFullScreen, setIsFullScreen] = useState(false);
+
+  useEffect(() => {
+    enterFullScreen().catch(() => {});
+    const unsubscribe = subscribeToFullscreenChange((active) => {
+      setIsFullScreen(active);
+    });
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   useEffect(() => {
     async function initAttempt() {
@@ -71,11 +89,17 @@ export default function AssignmentAttemptPage() {
         },
         session?.token
       );
+      await exitFullScreen();
       navigate(`/student/courses/${courseId}`);
     } catch (err) {
       setError(err.message);
       setLoading(false);
     }
+  };
+
+  const handleBackToCourse = async () => {
+    await exitFullScreen();
+    navigate(`/student/courses/${courseId}`);
   };
 
   if (loading) return <div style={{ padding: "2rem" }}>Loading assignment...</div>;
@@ -88,7 +112,37 @@ export default function AssignmentAttemptPage() {
     <div style={{ display: "flex", height: "100vh" }}>
       {/* Sidebar Navigation */}
       <div style={{ width: "250px", background: "#f8fafc", padding: "1rem", borderRight: "1px solid #e2e8f0", overflowY: "auto" }}>
-        <Link to={`/student/courses/${courseId}`} style={{ display: "block", marginBottom: "1rem" }}>← Back to Course</Link>
+        <button
+          onClick={handleBackToCourse}
+          style={{ background: "none", border: "none", color: "#0284c7", cursor: "pointer", padding: 0, marginBottom: "1rem", textAlign: "left", fontSize: "0.9rem" }}
+        >
+          ← Back to Course
+        </button>
+
+        <button
+          type="button"
+          onClick={() => toggleFullScreen()}
+          style={{
+            marginBottom: "1rem",
+            width: "100%",
+            padding: "0.45rem 0.75rem",
+            background: isFullScreen ? "rgba(16, 185, 129, 0.12)" : "#e2e8f0",
+            color: isFullScreen ? "#10b981" : "#334155",
+            border: isFullScreen ? "1px solid rgba(16, 185, 129, 0.3)" : "1px solid #cbd5e1",
+            borderRadius: "6px",
+            cursor: "pointer",
+            fontWeight: 600,
+            fontSize: "0.825rem",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "0.4rem"
+          }}
+        >
+          <span>{isFullScreen ? "Exit Full Screen" : "Enter Full Screen"}</span>
+          <span>⛶</span>
+        </button>
+
         <h3 style={{ marginBottom: "1rem" }}>{assignment.title}</h3>
         
         <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
@@ -145,16 +199,38 @@ export default function AssignmentAttemptPage() {
               </div>
             </div>
           ) : (
-            <div>
-              <h3>{currentQ.title}</h3>
-              <p style={{ whiteSpace: "pre-wrap", margin: "1rem 0" }}>{currentQ.statement}</p>
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+              gap: "1.5rem",
+              alignItems: "start"
+            }}>
+              <div style={{ background: "#f8fafc", padding: "1.25rem", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+                <h3 style={{ marginTop: 0 }}>{currentQ.title}</h3>
+                <p style={{ whiteSpace: "pre-wrap", margin: "1rem 0", lineHeight: 1.6, color: "#334155" }}>{currentQ.statement}</p>
+                {currentQ.inputFormat && (
+                  <p style={{ fontSize: "0.85rem", color: "#64748b" }}>
+                    <strong>Input Format:</strong> {currentQ.inputFormat}
+                  </p>
+                )}
+                {currentQ.outputFormat && (
+                  <p style={{ fontSize: "0.85rem", color: "#64748b" }}>
+                    <strong>Output Format:</strong> {currentQ.outputFormat}
+                  </p>
+                )}
+                {currentQ.constraintsText && (
+                  <p style={{ fontSize: "0.85rem", color: "#f59e0b" }}>
+                    <strong>Constraints:</strong> <code>{currentQ.constraintsText}</code>
+                  </p>
+                )}
+              </div>
               
-              <div style={{ marginTop: "2rem" }}>
+              <div>
                 <label className="auth-label">Your Code (Language: JavaScript)</label>
                 <textarea 
                   className="auth-input" 
-                  rows={15} 
-                  style={{ fontFamily: "monospace", background: "#1e293b", color: "#f8fafc" }}
+                  rows={18}
+                  style={{ fontFamily: "monospace", background: "#1e293b", color: "#f8fafc", width: "100%", height: "420px" }}
                   value={answers[currentQ.id]?.code || ""}
                   onChange={e => handleSaveProgress(currentQ.id, 'coding', { language: 'javascript', code: e.target.value })}
                   placeholder="// Write your code here..."
