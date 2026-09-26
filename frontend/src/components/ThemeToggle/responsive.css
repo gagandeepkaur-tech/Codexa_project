@@ -1,0 +1,8 @@
+@media (max-width: 860px) {
+  .theme-toggle-button {
+    right: 0.85rem;
+    bottom: 0.85rem;
+    min-width: 132px;
+    padding: 0.72rem 0.82rem;
+  }
+}

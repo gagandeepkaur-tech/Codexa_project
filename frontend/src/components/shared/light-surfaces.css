@@ -1,0 +1,16 @@
+[data-theme="light"] .landing-page,
+[data-theme="light"] .auth-page,
+[data-theme="light"] .student-auth-page,
+[data-theme="light"] .admin-auth-page,
+[data-theme="light"] .dashboard-page,
+[data-theme="light"] .student-dashboard-page,
+[data-theme="light"] .admin-dashboard-page,
+[data-theme="light"] .platform-page,
+[data-theme="light"] .student-platform-page,
+[data-theme="light"] .admin-platform-page,
+[data-theme="light"] .faculty-platform-page,
+[data-theme="light"] .detail-page,
+[data-theme="light"] .student-detail-page,
+[data-theme="light"] .admin-detail-page {
+  background: #fafafa !important;
+}

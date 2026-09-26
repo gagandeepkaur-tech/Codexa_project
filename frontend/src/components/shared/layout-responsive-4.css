@@ -1,0 +1,13 @@
+@media (max-width: 1024px) {
+
+  .platform-stats-grid,
+  .quick-actions-row,
+  .course-grid,
+  .faculty-feature-grid,
+  .faculty-summary-band,
+  .faculty-builder-grid,
+  .faculty-workbench,
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+}

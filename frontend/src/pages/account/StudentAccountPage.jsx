@@ -24,8 +24,8 @@ import {
   ExternalLink,
   Code2
 } from "lucide-react";
-import { PlatformLayout } from "../../components/PlatformLayout";
-import SubmissionHeatmap from "../../components/SubmissionHeatmap";
+import { PlatformLayout } from "../../components/PlatformLayout/PlatformLayout";
+import SubmissionHeatmap from "../../components/SubmissionHeatmap/SubmissionHeatmap";
 import { useTheme } from "../../components/ThemeProvider";
 import { ACCENT_PRESETS } from "../../components/accentPresets";
 import { getStudentSession, getAuthHeaders } from "../../utils/session";

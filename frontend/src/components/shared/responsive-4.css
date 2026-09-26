@@ -1,0 +1,20 @@
+@media (max-width: 860px) {
+
+  .platform-stats-grid,
+  .auth-side-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .course-grid,
+  .faculty-hero-grid,
+  .faculty-feature-grid,
+  .faculty-summary-band,
+  .faculty-alert-grid,
+  .faculty-builder-grid,
+  .faculty-focus-list,
+  .faculty-workbench,
+  .selection-grid,
+  .course-builder-top-grid {
+    grid-template-columns: 1fr;
+  }
+}

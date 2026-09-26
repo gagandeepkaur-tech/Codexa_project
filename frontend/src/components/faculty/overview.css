@@ -1,0 +1,201 @@
+.faculty-hero-grid {
+  display: grid;
+  grid-template-columns: 1.4fr repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.faculty-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.faculty-summary-band,
+.faculty-note-stack {
+  display: grid;
+  gap: 1rem;
+}
+
+.faculty-summary-band {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.faculty-summary-item,
+.faculty-ranked-card,
+.faculty-alert-card,
+.faculty-note-card,
+.faculty-workbench-main,
+.faculty-workbench-side {
+  border-radius: 22px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.faculty-summary-item,
+.faculty-alert-card,
+.faculty-note-card,
+.faculty-workbench-side {
+  padding: 1.2rem;
+}
+
+.faculty-summary-item span,
+.faculty-ranked-metric,
+.faculty-ranked-index {
+  color: #9cdcfe;
+  font-weight: 700;
+}
+
+.faculty-summary-item strong {
+  display: block;
+  margin-top: 0.55rem;
+  font-size: 1.65rem;
+}
+
+.faculty-summary-item p,
+.faculty-note-card p,
+.faculty-alert-card p,
+.faculty-ranked-copy p,
+.faculty-workbench-main p,
+.faculty-workbench-side p {
+  color: #cbd5e1;
+}
+
+.faculty-ranked-list,
+.faculty-builder-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.faculty-ranked-card {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem 1.2rem;
+}
+
+.faculty-ranked-index {
+  font-size: 1.5rem;
+}
+
+.faculty-ranked-copy strong,
+.faculty-note-card strong,
+.faculty-alert-card strong,
+.faculty-workbench-side strong {
+  display: block;
+}
+
+.faculty-alert-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.faculty-workbench {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(280px, 0.9fr);
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.faculty-workbench-main {
+  padding: 1.5rem;
+  background:
+    radial-gradient(circle at top right, rgba(14, 165, 233, 0.18), transparent 34%),
+    linear-gradient(145deg, rgba(45, 212, 191, 0.14), rgba(255, 255, 255, 0.03));
+}
+
+.faculty-workbench-main h3 {
+  margin: 0.45rem 0 0;
+  font-size: 2rem;
+}
+
+.faculty-builder-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.faculty-feature-card,
+.faculty-mini-panel,
+.faculty-focus-item,
+.faculty-overview-card,
+.faculty-list-card,
+.faculty-course-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.faculty-feature-card {
+  padding: 1.35rem;
+  border-radius: 22px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  background:
+    radial-gradient(circle at top right, rgba(125, 211, 252, 0.12), transparent 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03));
+}
+
+.faculty-feature-card-accent {
+  background:
+    radial-gradient(circle at top right, rgba(45, 212, 191, 0.18), transparent 36%),
+    linear-gradient(145deg, rgba(14, 165, 233, 0.18), rgba(255, 255, 255, 0.03));
+}
+
+.faculty-feature-card h3,
+.faculty-mini-panel strong,
+.faculty-focus-item strong {
+  margin: 0.45rem 0 0;
+  font-size: 1.15rem;
+}
+
+.faculty-feature-card p,
+.faculty-mini-panel p,
+.faculty-focus-item p {
+  margin: 0.75rem 0 0;
+  color: #cbd5e1;
+}
+
+.faculty-feature-label {
+  color: #9cdcfe;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.faculty-mini-panel {
+  padding: 1.1rem;
+  border-radius: 20px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.faculty-mini-metric {
+  display: inline-flex;
+  margin-top: 0.85rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(14, 99, 156, 0.16);
+  color: #9cdcfe;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.faculty-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 0.4rem;
+}
+
+.faculty-focus-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.faculty-focus-item {
+  padding: 1.15rem;
+  border-radius: 20px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.03));
+}

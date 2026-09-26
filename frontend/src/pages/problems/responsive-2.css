@@ -1,0 +1,34 @@
+@media (max-width: 860px) {
+
+  .workspace-topbar,
+  .workspace-page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .workspace-shell {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .workspace-problem-panel,
+  .editor-column {
+    grid-column: 1 !important;
+    grid-row: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .workspace-column-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .workspace-editor-toolbar-row {
+    align-items: flex-start;
+  }
+
+  .editor-zoom-controls {
+    margin-left: 0;
+  }
+}

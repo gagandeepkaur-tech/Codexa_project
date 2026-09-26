@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { PlatformLayout, PlatformSection } from "../../components/PlatformLayout";
+import { PlatformLayout, PlatformSection } from "../../components/PlatformLayout/PlatformLayout";
 import { getAdminSession, getAuthHeaders } from "../../utils/session";
 import { apiRequest } from "../../utils/api";
 

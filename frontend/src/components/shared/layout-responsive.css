@@ -1,0 +1,10 @@
+@media (max-width: 1180px) {
+
+  .platform-hero,
+  .platform-hero-side,
+  .platform-section-head,
+  .workspace-topbar,
+  .workspace-page-header {
+    flex-wrap: wrap;
+  }
+}

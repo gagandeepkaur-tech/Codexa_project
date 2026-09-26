@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { PlatformLayout, PlatformSection, PlatformStats } from "../../components/PlatformLayout";
+import { PlatformLayout, PlatformSection, PlatformStats } from "../../components/PlatformLayout/PlatformLayout";
 import { getAdminSession, getAuthHeaders } from "../../utils/session";
 
 

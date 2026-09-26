@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import AccountSection from "../../components/AccountSection";
-import { PlatformLayout, PlatformSection, PlatformStats } from "../../components/PlatformLayout";
+import AccountSection from "../../components/AccountSection/AccountSection";
+import { PlatformLayout, PlatformSection, PlatformStats } from "../../components/PlatformLayout/PlatformLayout";
 import { getAdminSession, saveAdminSession } from "../../utils/session";
 
 export default function AdminAccountPage() {

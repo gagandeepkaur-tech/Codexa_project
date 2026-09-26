@@ -1,0 +1,35 @@
+[data-theme="light"] .workspace-timer-chip {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.22);
+  color: #92400e;
+}
+
+[data-theme="light"] .workspace-timer-chip.paused {
+  background: rgba(148, 163, 184, 0.12);
+  border-color: rgba(148, 163, 184, 0.22);
+  color: #475569;
+}
+
+[data-theme="light"] .workspace-brief-card,
+[data-theme="light"] .workspace-note-card,
+[data-theme="light"] .workspace-file-pill,
+[data-theme="light"] .workspace-file-tab,
+[data-theme="light"] .workspace-console-tab {
+  background: rgba(255, 255, 255, 0.88);
+  border-color: rgba(148, 163, 184, 0.22);
+  color: #475569;
+}
+
+[data-theme="light"] .workspace-file-tab,
+[data-theme="light"] .workspace-console-tab.active {
+  color: #0f172a;
+}
+
+[data-theme="light"] .workspace-brief-card strong {
+  color: #0f172a;
+}
+
+[data-theme="light"] .workspace-brief-card p,
+[data-theme="light"] .workspace-note-card p {
+  color: #475569;
+}

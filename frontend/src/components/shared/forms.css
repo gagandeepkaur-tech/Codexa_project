@@ -1,0 +1,94 @@
+.auth-form {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 1.75rem;
+}
+
+.form-field {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.auth-form input {
+  width: 100%;
+  padding: 1rem 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 18px;
+  background: rgba(241, 245, 249, 0.96);
+  color: #0f172a;
+  font-weight: 500;
+  outline: none;
+}
+
+.auth-form select,
+.auth-form textarea {
+  width: 100%;
+  padding: 0.95rem 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 16px;
+  background: rgba(15, 23, 42, 0.86);
+  color: #f8fafc;
+  outline: none;
+  resize: vertical;
+}
+
+.auth-form input:focus {
+  border-color: rgba(56, 189, 248, 0.8);
+  box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.15);
+}
+
+.auth-form input::placeholder {
+  color: #64748b;
+}
+
+.auth-form select:focus,
+.auth-form textarea:focus {
+  border-color: rgba(56, 189, 248, 0.8);
+  box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.15);
+}
+
+.auth-button {
+  margin-top: 0.6rem;
+  padding: 0.95rem 1.2rem;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #f97316, #fb7185);
+  color: #fff7ed;
+  font-size: 0.98rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.student-button {
+  background: linear-gradient(135deg, #14b8a6, #0ea5e9);
+  color: #ecfeff;
+}
+
+.admin-button {
+  background: linear-gradient(135deg, #f97316, #ef4444);
+  color: #fff7ed;
+}
+
+.danger-button {
+  background: linear-gradient(135deg, #dc2626, #7f1d1d);
+  color: #fff1f2;
+}
+
+.auth-button:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.form-status {
+  margin: 1rem 0 0;
+  font-weight: 600;
+}
+
+.form-status.success {
+  color: #86efac;
+}
+
+.form-status.error {
+  color: #5ed562;
+}

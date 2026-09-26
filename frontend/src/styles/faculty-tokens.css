@@ -1,0 +1,26 @@
+/* ==========================================================================
+   CODEXA FACULTY DASHBOARD REDESIGN SYSTEM
+   ========================================================================== */
+
+:root {
+  --fd-bg: #0A0E17;
+  --fd-surface: #111622;
+  --fd-card: #161C28;
+  --fd-card-glass: rgba(22, 28, 40, 0.75);
+  --fd-border: rgba(255, 255, 255, 0.07);
+  --fd-border-glow: rgba(99, 102, 241, 0.25);
+  --fd-primary: #6366F1;
+  --fd-primary-glow: rgba(99, 102, 241, 0.18);
+  --fd-secondary: #0EA5E9;
+  --fd-success: #10B981;
+  --fd-warning: #F59E0B;
+  --fd-danger: #E11D48;
+  --fd-text-primary: #F8FAFC;
+  --fd-text-secondary: #94A3B8;
+  --fd-text-muted: #64748B;
+  --fd-radius-sm: 10px;
+  --fd-radius-md: 16px;
+  --fd-radius-lg: 20px;
+  --fd-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  --fd-shadow-glow: 0 6px 24px rgba(99, 102, 241, 0.12);
+}

@@ -1,9 +1,10 @@
+import "./loading.css";
 import { lazy, Suspense } from "react";
 import { Route, Routes, Navigate, Outlet } from "react-router-dom";
 import { getStudentSession, getFacultySession, getAdminSession } from "../utils/session";
 
 // Lazy-loaded route components for optimal initial bundle size and performance
-const HomePage = lazy(() => import("../pages/HomePage"));
+const HomePage = lazy(() => import("../pages/home/HomePage"));
 const Login = lazy(() => import("../pages/login/Login"));
 const StudentDashboard = lazy(() => import("../pages/dashboard/StudentDashboard"));
 const FacultyDashboard = lazy(() => import("../pages/dashboard/FacultyDashboard"));
@@ -59,7 +60,7 @@ function PageFallback() {
         borderTopColor: "#ff7e29",
         animation: "routeSpin 0.8s linear infinite"
       }} />
-      <style>{`@keyframes routeSpin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
+
       <span style={{ fontSize: "0.85rem", letterSpacing: "0.02em" }}>Loading...</span>
     </div>
   );

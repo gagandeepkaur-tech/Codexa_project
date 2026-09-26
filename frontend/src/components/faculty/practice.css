@@ -1,0 +1,33 @@
+/* Practice Problem Cards */
+.fd-problem-card {
+  background: var(--fd-card);
+  border: 1px solid var(--fd-border);
+  border-radius: var(--fd-radius-md);
+  padding: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+  transition: all 0.25s ease;
+}
+.fd-problem-card:hover {
+  border-color: rgba(124, 92, 255, 0.35);
+  transform: translateX(4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+.fd-tags-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+.fd-tag-pill {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--fd-border);
+  color: var(--fd-text-secondary);
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.72rem;
+}

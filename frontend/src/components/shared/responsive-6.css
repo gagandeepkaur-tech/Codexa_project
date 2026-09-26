@@ -1,0 +1,9 @@
+@media (max-width: 860px) {
+
+  .workspace-problem-header,
+  .workspace-section-heading,
+  .sample-case-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

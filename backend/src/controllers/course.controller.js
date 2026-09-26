@@ -1,4 +1,6 @@
+import { randomBytes } from "node:crypto";
 import { pool } from "../config/db.js";
+import { hashPassword } from "../utils/auth.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { executeSubmission } from "../utils/codeExecution.js";
 
@@ -27,6 +29,7 @@ function normalizeCoursePayload(body, currentUser = null) {
   if (facultyIds.length === 0 && currentUser?.id) facultyIds = [currentUser.id];
 
   return {
+    program: body.program?.trim() || "",
     code: body.code?.trim().toUpperCase() || "",
     title: body.title?.trim() || "",
     description: body.description?.trim() || "",
@@ -42,7 +45,7 @@ function normalizeCoursePayload(body, currentUser = null) {
 async function buildCourseCard(client, courseId, currentUser) {
   const courseResult = await client.query(
     `
-      SELECT id, code, title, description, is_active, created_at, updated_at
+      SELECT id, program, code, title, description, is_active, created_at, updated_at
       FROM courses
       WHERE id = $1
     `,
@@ -101,9 +104,11 @@ async function buildCourseCard(client, courseId, currentUser) {
 
   return {
     id: courseId,
+    program: courseResult.rows[0].program || "",
     code: courseResult.rows[0].code,
     title: courseResult.rows[0].title,
     description: courseResult.rows[0].description || "",
+    audiences,
     branchTargets,
     semesterTargets,
     sectionTargets,
@@ -330,9 +335,9 @@ export const getCourseFilters = asyncHandler(async (_req, res) => {
 export const createCourse = asyncHandler(async (req, res) => {
   const payload = normalizeCoursePayload(req.body, req.currentUser);
 
-  if (!payload.code || !payload.title) {
+  if (!payload.program || !payload.code || !payload.title) {
     return res.status(400).json({
-      message: "Course code and title are required."
+      message: "Program, course code, and course name are required."
     });
   }
 
@@ -343,11 +348,11 @@ export const createCourse = asyncHandler(async (req, res) => {
 
     const insertResult = await client.query(
       `
-        INSERT INTO courses (code, title, description, instructor_id, is_active, updated_at)
-        VALUES ($1, $2, $3, $4, TRUE, NOW())
-        RETURNING id
+        INSERT INTO courses (program, code, title, description, instructor_id, is_active, roster_restricted, updated_at)
+        VALUES ($1, $2, $3, $4, $5, TRUE, FALSE, NOW())
+        RETURNING id, roster_restricted
       `,
-      [payload.code, payload.title, payload.description, payload.facultyIds[0] || null]
+      [payload.program, payload.code, payload.title, payload.description, payload.facultyIds[0] || null]
     );
 
     const courseId = insertResult.rows[0].id;
@@ -371,9 +376,9 @@ export const createCourse = asyncHandler(async (req, res) => {
 export const updateCourse = asyncHandler(async (req, res) => {
   const payload = normalizeCoursePayload(req.body);
 
-  if (!payload.code || !payload.title || payload.audiences.length === 0 || payload.facultyIds.length === 0) {
+  if (!payload.program || !payload.code || !payload.title || payload.audiences.length === 0 || payload.facultyIds.length === 0) {
     return res.status(400).json({
-      message: "Course code, title, audience filters, and assigned faculty are required."
+      message: "Program, course code, course name, audience filters, and assigned faculty are required."
     });
   }
 
@@ -385,15 +390,16 @@ export const updateCourse = asyncHandler(async (req, res) => {
     const updateResult = await client.query(
       `
         UPDATE courses
-        SET code = $1,
-            title = $2,
-            description = $3,
-            instructor_id = $4,
+        SET program = $1,
+            code = $2,
+            title = $3,
+            description = $4,
+            instructor_id = $5,
             updated_at = NOW()
-        WHERE id = $5 AND is_active = TRUE
-        RETURNING id
+        WHERE id = $6 AND is_active = TRUE
+        RETURNING id, roster_restricted
       `,
-      [payload.code, payload.title, payload.description, payload.facultyIds[0] || null, req.params.courseId]
+      [payload.program, payload.code, payload.title, payload.description, payload.facultyIds[0] || null, req.params.courseId]
     );
 
     if (updateResult.rows.length === 0) {
@@ -402,7 +408,9 @@ export const updateCourse = asyncHandler(async (req, res) => {
     }
 
     await syncCourseRelations(client, req.params.courseId, payload.audiences, payload.facultyIds);
-    await syncCourseEnrollments(client, req.params.courseId);
+    if (!updateResult.rows[0].roster_restricted) {
+      await syncCourseEnrollments(client, req.params.courseId);
+    }
     await client.query("COMMIT");
 
     res.json({
@@ -492,20 +500,24 @@ export const listCourses = asyncHandler(async (req, res) => {
               AND ce.status = 'enrolled'
           )
           OR
-          EXISTS (
-            SELECT 1
-            FROM course_audiences ca
-            WHERE ca.course_id = c.id
-              AND (UPPER(ca.branch) = $${values.length - 3} OR UPPER(ca.branch) = 'ALL')
-              AND (ca.semester = $${values.length - 2} OR ca.semester = 0)
-              AND (UPPER(ca.section) = $${values.length - 1} OR UPPER(ca.section) = 'ALL')
-              AND (ca.batch = $${values.length} OR ca.batch = 'ALL')
-          )
-          OR
-          NOT EXISTS (
-            SELECT 1
-            FROM course_audiences ca
-            WHERE ca.course_id = c.id
+            (
+              NOT c.roster_restricted
+              AND (
+                EXISTS (
+                  SELECT 1
+                  FROM course_audiences ca
+                  WHERE ca.course_id = c.id
+                    AND (UPPER(ca.branch) = $${values.length - 3} OR UPPER(ca.branch) = 'ALL')
+                    AND (ca.semester = $${values.length - 2} OR ca.semester = 0)
+                    AND (UPPER(ca.section) = $${values.length - 1} OR UPPER(ca.section) = 'ALL')
+                    AND (ca.batch = $${values.length} OR ca.batch = 'ALL')
+                )
+                OR NOT EXISTS (
+                  SELECT 1
+                  FROM course_audiences ca
+                  WHERE ca.course_id = c.id
+                )
+              )
           )
         )`
       );
@@ -524,7 +536,7 @@ export const listCourses = asyncHandler(async (req, res) => {
 
   if (search) {
     values.push(`%${search}%`);
-    filters.push(`(c.code ILIKE $${values.length} OR c.title ILIKE $${values.length} OR COALESCE(c.description, '') ILIKE $${values.length})`);
+    filters.push(`(c.program ILIKE $${values.length} OR c.code ILIKE $${values.length} OR c.title ILIKE $${values.length} OR COALESCE(c.description, '') ILIKE $${values.length})`);
   }
 
   const result = await pool.query(
@@ -539,21 +551,6 @@ export const listCourses = asyncHandler(async (req, res) => {
 
   const client = await pool.connect();
   try {
-    const courses = await Promise.all(
-      result.rows.map((row) => buildCourseCard(client, row.id, req.currentUser))
-    );
-    res.json(courses);
-  } finally {
-    client.release();
-  }
-});
-
-export const getCourseById = asyncHandler(async (req, res) => {
-  const client = await pool.connect();
-
-  try {
-    const courseCard = await buildCourseCard(client, req.course.id, req.currentUser);
-
     const materialsResult = await client.query(
       `
         SELECT id, title, description, material_type AS type, url, created_at
@@ -1062,4 +1059,192 @@ export const getCourseStudents = asyncHandler(async (req, res) => {
       email: row.email
     }))
   );
+});
+
+export const getCourseRoster = asyncHandler(async (req, res) => {
+  const result = await pool.query(
+    `
+      SELECT u.id, u.full_name, u.email, sp.roll_number
+      FROM course_enrollments ce
+      JOIN users u ON u.id = ce.student_id AND u.role = 'student'
+      LEFT JOIN student_profiles sp ON sp.user_id = u.id
+      WHERE ce.course_id = $1 AND ce.status = 'enrolled'
+      ORDER BY u.full_name ASC
+    `,
+    [req.course.id]
+  );
+
+  res.json(result.rows.map((row) => ({
+    id: row.id,
+    fullName: row.full_name,
+    username: row.roll_number,
+    email: row.email
+  })));
+});
+
+async function restrictCourseToRoster(client, courseId) {
+  const courseResult = await client.query(
+    "SELECT roster_restricted FROM courses WHERE id = $1 FOR UPDATE",
+    [courseId]
+  );
+
+  if (!courseResult.rows[0]?.roster_restricted) {
+    await client.query(
+      "UPDATE courses SET roster_restricted = TRUE, updated_at = NOW() WHERE id = $1",
+      [courseId]
+    );
+    await client.query(
+      "UPDATE course_enrollments SET status = 'archived', updated_at = NOW() WHERE course_id = $1",
+      [courseId]
+    );
+  }
+}
+
+export const importCourseStudents = asyncHandler(async (req, res) => {
+  const { students } = req.body;
+  if (!Array.isArray(students) || students.length === 0 || students.length > 500) {
+    return res.status(400).json({ message: "Upload a CSV containing between 1 and 500 students." });
+  }
+
+  const normalizedStudents = students.map((student) => ({
+    crn: String(student?.crn || "").trim(),
+    fullName: String(student?.fullName || "").trim(),
+    branch: String(student?.branch || "UNASSIGNED").trim().toUpperCase(),
+    semester: Number(student?.semester || 1),
+    section: String(student?.section || "UNASSIGNED").trim().toUpperCase(),
+    batch: String(student?.batch || "UNASSIGNED").trim()
+  }));
+
+  const seenCrns = new Set();
+  for (const student of normalizedStudents) {
+    const key = student.crn.toLowerCase();
+    if (!/^[a-z0-9_-]{1,80}$/i.test(student.crn)) {
+      return res.status(400).json({ message: "Every CSV row must have a valid CRN (letters, numbers, _ or -)." });
+    }
+    if (seenCrns.has(key)) {
+      return res.status(400).json({ message: `The CSV contains duplicate CRN ${student.crn}.` });
+    }
+    if (!Number.isInteger(student.semester) || student.semester < 1 || student.semester > 12) {
+      return res.status(400).json({ message: `Invalid semester for CRN ${student.crn}.` });
+    }
+    seenCrns.add(key);
+  }
+
+  const client = await pool.connect();
+  const credentials = [];
+
+  try {
+    await client.query("BEGIN");
+
+    const existingResult = await client.query(
+      `
+        SELECT sp.roll_number
+        FROM student_profiles sp
+        WHERE LOWER(sp.roll_number) = ANY($1::text[])
+      `,
+      [normalizedStudents.map((student) => student.crn.toLowerCase())]
+    );
+
+    if (existingResult.rows.length > 0) {
+      await client.query("ROLLBACK");
+      const existingCrns = existingResult.rows.map((row) => row.roll_number);
+      return res.status(409).json({
+        message: `These CRNs already have student accounts: ${existingCrns.join(", ")}. Add existing students from the roster panel instead.`
+      });
+    }
+
+    await restrictCourseToRoster(client, req.course.id);
+
+    for (const student of normalizedStudents) {
+      const password = randomBytes(18).toString("base64url");
+      const email = `crn.${student.crn.toLowerCase()}@students.codexa.local`;
+      const userResult = await client.query(
+        `
+          INSERT INTO users (full_name, email, password_hash, role)
+          VALUES ($1, $2, $3, 'student')
+          RETURNING id
+        `,
+        [student.fullName || `Student ${student.crn}`, email, await hashPassword(password)]
+      );
+      const userId = userResult.rows[0].id;
+
+      await client.query(
+        `
+          INSERT INTO student_profiles (user_id, roll_number, branch, semester, section, batch)
+          VALUES ($1, $2, $3, $4, $5, $6)
+        `,
+        [userId, student.crn, student.branch, student.semester, student.section, student.batch]
+      );
+      await client.query(
+        `
+          INSERT INTO course_enrollments (course_id, student_id, status)
+          VALUES ($1, $2, 'enrolled')
+          ON CONFLICT (course_id, student_id)
+          DO UPDATE SET status = 'enrolled', updated_at = NOW()
+        `,
+        [req.course.id, userId]
+      );
+      credentials.push({ username: student.crn, password, fullName: student.fullName || `Student ${student.crn}` });
+    }
+
+    await client.query("COMMIT");
+    res.status(201).json({
+      message: `${credentials.length} student account${credentials.length === 1 ? "" : "s"} created and enrolled.`,
+      credentials
+    });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
+});
+
+export const addCourseStudent = asyncHandler(async (req, res) => {
+  const username = String(req.body.username || req.body.crn || "").trim();
+  if (!username) {
+    return res.status(400).json({ message: "Enter a student's CRN / username." });
+  }
+
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    const studentResult = await client.query(
+      `
+        SELECT u.id, u.full_name, sp.roll_number
+        FROM users u
+        JOIN student_profiles sp ON sp.user_id = u.id
+        WHERE u.role = 'student' AND LOWER(sp.roll_number) = LOWER($1)
+      `,
+      [username]
+    );
+
+    if (studentResult.rows.length === 0) {
+      await client.query("ROLLBACK");
+      return res.status(404).json({ message: `No student account found for CRN ${username}.` });
+    }
+
+    await restrictCourseToRoster(client, req.course.id);
+    const student = studentResult.rows[0];
+    await client.query(
+      `
+        INSERT INTO course_enrollments (course_id, student_id, status)
+        VALUES ($1, $2, 'enrolled')
+        ON CONFLICT (course_id, student_id)
+        DO UPDATE SET status = 'enrolled', updated_at = NOW()
+      `,
+      [req.course.id, student.id]
+    );
+
+    await client.query("COMMIT");
+    res.status(200).json({
+      message: `${student.full_name} (${student.roll_number}) added to this course.`,
+      student: { id: student.id, fullName: student.full_name, username: student.roll_number }
+    });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
 });

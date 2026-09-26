@@ -1,0 +1,92 @@
+/* Fixed position toggle next to top-left brand */
+.lc-theme-toggle {
+  position: fixed;
+  top: 18px;
+  left: 168px;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(12px);
+  color: #FFA116;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  outline: none;
+}
+
+/* Inline toggle inside brand header */
+.lc-theme-toggle-inline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(30, 41, 59, 0.6);
+  backdrop-filter: blur(8px);
+  color: #FFA116;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  outline: none;
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+
+/* Light theme overrides for toggle button */
+body:not(.dark-theme) .lc-theme-toggle,
+body[class*="light"] .lc-theme-toggle,
+html[data-theme="light"] .lc-theme-toggle,
+body:not(.dark-theme) .lc-theme-toggle-inline,
+body[class*="light"] .lc-theme-toggle-inline,
+html[data-theme="light"] .lc-theme-toggle-inline {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #d97706;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.lc-theme-toggle:hover,
+.lc-theme-toggle-inline:hover {
+  transform: rotate(20deg) scale(1.08);
+  background: rgba(50, 60, 80, 0.85);
+  border-color: #FFA116;
+  box-shadow: 0 0 12px rgba(250, 161, 22, 0.3);
+}
+
+body:not(.dark-theme) .lc-theme-toggle:hover,
+body[class*="light"] .lc-theme-toggle:hover,
+html[data-theme="light"] .lc-theme-toggle:hover,
+body:not(.dark-theme) .lc-theme-toggle-inline:hover,
+body[class*="light"] .lc-theme-toggle-inline:hover,
+html[data-theme="light"] .lc-theme-toggle-inline:hover {
+  background: #ffffff;
+  border-color: #d97706;
+  box-shadow: 0 0 12px rgba(217, 119, 6, 0.25);
+}
+
+.lc-theme-toggle:active,
+.lc-theme-toggle-inline:active {
+  transform: scale(0.95);
+}
+
+.lc-theme-toggle-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.4s ease;
+}
+
+@media (max-width: 768px) {
+  .lc-theme-toggle {
+    top: 14px;
+    left: auto;
+    right: 16px;
+  }
+}

@@ -1,0 +1,17 @@
+/* Custom Danger Button Styles for cards */
+.platform-danger-btn {
+  width: 100%;
+  margin-top: 0 !important;
+  background: rgba(239, 68, 68, 0.08) !important;
+  border: 1px solid rgba(239, 68, 68, 0.2) !important;
+  color: #fca5a5 !important;
+  text-align: center;
+}
+.platform-danger-btn:hover {
+  background: rgba(239, 68, 68, 0.16) !important;
+  border-color: rgba(239, 68, 68, 0.3) !important;
+}
+[data-theme="light"] .platform-danger-btn:hover {
+  background: #fee2e2 !important;
+  border-color: #fca5a5 !important;
+}

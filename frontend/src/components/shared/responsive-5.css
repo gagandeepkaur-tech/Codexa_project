@@ -1,0 +1,12 @@
+@media (max-width: 860px) {
+
+  .question-panel-header,
+  .question-card-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+}

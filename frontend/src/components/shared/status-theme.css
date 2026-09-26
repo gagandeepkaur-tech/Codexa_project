@@ -1,0 +1,16 @@
+[data-theme="light"] .form-status.success,
+[data-theme="light"] .status-pill.accepted,
+[data-theme="light"] .difficulty-pill.easy {
+  color: #15803d;
+}
+
+[data-theme="light"] .form-status.error,
+[data-theme="light"] .status-pill.wrong_answer,
+[data-theme="light"] .difficulty-pill.hard {
+  color: #b91c1c;
+}
+
+[data-theme="light"] .status-pill.time_limit,
+[data-theme="light"] .difficulty-pill.medium {
+  color: #b45309;
+}

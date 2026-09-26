@@ -1,0 +1,18 @@
+@media (max-width: 640px) {
+
+  .auth-page {
+    padding: 1rem 0.75rem;
+    gap: 1rem;
+  }
+
+  .auth-panel,
+  .dashboard-card,
+  .auth-side,
+  .auth-form-card,
+  .platform-hero,
+  .recent-activity-section,
+  .custom-modal {
+    padding: 1.15rem;
+    border-radius: 22px;
+  }
+}

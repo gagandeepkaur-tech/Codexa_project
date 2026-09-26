@@ -1,0 +1,62 @@
+/* Quick Actions Cards */
+.quick-actions-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+.quick-action-card {
+  background: var(--lc-bg-card);
+  border: 1px solid var(--lc-border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+  transition: all 150ms ease;
+  text-decoration: none;
+}
+.quick-action-card:hover {
+  border-color: var(--lc-accent);
+  background: rgba(255, 255, 255, 0.02);
+}
+.quick-action-icon-wrapper {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.quick-action-icon-wrapper.green {
+  background: rgba(44, 187, 93, 0.1);
+  color: var(--lc-success);
+}
+.quick-action-icon-wrapper.orange {
+  background: rgba(255, 161, 22, 0.1);
+  color: var(--lc-accent);
+}
+.quick-action-icon-wrapper.purple {
+  background: rgba(168, 85, 247, 0.1);
+  color: #a855f7;
+}
+.quick-action-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.quick-action-info h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--lc-text-primary);
+}
+.quick-action-info p {
+  margin: 0.2rem 0 0 0;
+  font-size: 0.75rem;
+  color: var(--lc-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

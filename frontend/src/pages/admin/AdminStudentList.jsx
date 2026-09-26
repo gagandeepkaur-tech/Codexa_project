@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { PlatformLayout, PlatformSection, PlatformStats } from "../../components/PlatformLayout";
+import { PlatformLayout, PlatformSection, PlatformStats } from "../../components/PlatformLayout/PlatformLayout";
 import { clearAdminSession, getAdminSession, getAuthHeaders } from "../../utils/session";
 import { branchOptions, buildSemesterOptions, sectionOptions } from "../../types/course";
+import AdminCourseRoster from "./AdminCourseRoster";
 
 
 const apiBaseUrl = import.meta.env.VITE_API_URL || "https://codexa-project.onrender.com/api";
@@ -536,6 +537,8 @@ export default function AdminStudentList() {
           🛡️ Administrators
         </Link>
       </div>
+
+      {activeTab === "list" && <AdminCourseRoster />}
 
       {activeTab === "list" && (
         <>

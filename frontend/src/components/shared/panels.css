@@ -1,0 +1,66 @@
+.auth-panel,
+.dashboard-card {
+  width: 100%;
+  margin: 0 auto;
+  padding: 2rem;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 28px;
+  background: rgba(15, 23, 42, 0.78);
+  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.35);
+  backdrop-filter: blur(18px);
+}
+
+.auth-entry-panel {
+  display: grid;
+  gap: 1.4rem;
+  align-content: center;
+}
+
+.student-panel {
+  background: linear-gradient(180deg, rgba(8, 28, 21, 0.82), rgba(12, 74, 110, 0.72));
+}
+
+.admin-panel {
+  background: linear-gradient(180deg, rgba(49, 19, 19, 0.84), rgba(67, 20, 7, 0.72));
+}
+
+.student-dashboard-card {
+  max-width: 760px;
+  background: linear-gradient(180deg, rgba(8, 47, 73, 0.84), rgba(12, 74, 110, 0.72));
+}
+
+.admin-dashboard-card {
+  max-width: 760px;
+  background: linear-gradient(180deg, rgba(63, 13, 18, 0.84), rgba(120, 53, 15, 0.72));
+}
+
+.detail-card {
+  width: min(920px, 100%);
+  margin: 0 auto;
+  padding: 2.25rem;
+  border-radius: 30px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  box-shadow: 0 30px 90px rgba(2, 6, 23, 0.35);
+  backdrop-filter: blur(18px);
+}
+
+.student-detail-card {
+  background: linear-gradient(180deg, rgba(8, 47, 73, 0.84), rgba(15, 118, 110, 0.7));
+}
+
+.student-workspace-card {
+  width: 100%;
+  max-width: none;
+  min-height: 100vh;
+  padding: 0.9rem;
+  border-radius: 0;
+  border-left: 0;
+  border-right: 0;
+  background:
+    linear-gradient(180deg, rgba(18, 18, 18, 0.98), rgba(24, 24, 27, 0.97)),
+    #111214;
+}
+
+.admin-detail-card {
+  background: linear-gradient(180deg, rgba(63, 13, 18, 0.84), rgba(154, 52, 18, 0.7));
+}

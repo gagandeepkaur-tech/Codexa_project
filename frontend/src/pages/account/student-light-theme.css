@@ -1,0 +1,109 @@
+/* Student Account Page Light Mode Fixes */
+[data-theme="light"] .sap-section-card,
+[data-theme="light"] .sap-hero-card {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #0f172a !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
+}
+[data-theme="light"] .sap-section-title-group h2,
+[data-theme="light"] .sap-identity-details h1 {
+  color: #0f172a !important;
+}
+[data-theme="light"] .sap-user-bio {
+  color: #475569 !important;
+}
+[data-theme="light"] .sap-badge-chip {
+  background: #f1f5f9 !important;
+  border: 1px solid #cbd5e1 !important;
+  color: #334155 !important;
+}
+[data-theme="light"] .sap-stat-card {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+}
+[data-theme="light"] .sap-stat-value {
+  color: #0f172a !important;
+}
+[data-theme="light"] .sap-stat-label {
+  color: #334155 !important;
+}
+[data-theme="light"] .sap-stat-subtitle {
+  color: #64748b !important;
+}
+[data-theme="light"] .sap-difficulty-card {
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+}
+[data-theme="light"] .sap-diff-count {
+  color: #0f172a !important;
+}
+[data-theme="light"] .sap-diff-count span {
+  color: #64748b !important;
+}
+[data-theme="light"] .sap-diff-percent {
+  color: #64748b !important;
+}
+[data-theme="light"] .sap-progress-track {
+  background: #e2e8f0 !important;
+}
+[data-theme="light"] .sap-ai-mentor-card {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.08) 0%, rgba(37, 99, 235, 0.05) 100%) !important;
+  border: 1px solid rgba(124, 58, 237, 0.25) !important;
+  color: #0f172a !important;
+  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.08) !important;
+}
+[data-theme="light"] .sap-ai-header h2,
+[data-theme="light"] .sap-ai-header h3,
+[data-theme="light"] .sap-ai-mentor-card h3,
+[data-theme="light"] .sap-ai-mentor-card p,
+[data-theme="light"] .sap-ai-mentor-card span {
+  color: #0f172a !important;
+}
+[data-theme="light"] .sap-rec-box {
+  background: #ffffff !important;
+  border-color: rgba(124, 58, 237, 0.3) !important;
+  color: #334155 !important;
+}
+[data-theme="light"] .sap-rec-prob-item {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #0f172a !important;
+}
+[data-theme="light"] .sap-rec-prob-item:hover {
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #0284c7 !important;
+}
+[data-theme="light"] .sap-security-item {
+  border-bottom-color: #e2e8f0 !important;
+}
+[data-theme="light"] .sap-sec-label {
+  color: #0f172a !important;
+}
+[data-theme="light"] .sap-sec-val {
+  color: #64748b !important;
+}
+[data-theme="light"] .sap-social-card {
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #0f172a !important;
+}
+[data-theme="light"] .sap-social-card:hover {
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+[data-theme="light"] .sap-social-title {
+  color: #0f172a !important;
+}
+[data-theme="light"] .sap-social-handle {
+  color: #64748b !important;
+}
+[data-theme="light"] .sap-modal-card {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #0f172a !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
+}

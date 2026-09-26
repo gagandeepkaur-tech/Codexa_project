@@ -1,0 +1,35 @@
+[data-theme="light"] .faculty-feature-card,
+[data-theme="light"] .faculty-mini-panel,
+[data-theme="light"] .faculty-focus-item,
+[data-theme="light"] .faculty-summary-item,
+[data-theme="light"] .faculty-ranked-card,
+[data-theme="light"] .faculty-alert-card,
+[data-theme="light"] .faculty-note-card,
+[data-theme="light"] .faculty-workbench-main,
+[data-theme="light"] .faculty-workbench-side {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(248, 250, 252, 0.9));
+  border-color: rgba(148, 163, 184, 0.22);
+}
+
+[data-theme="light"] .faculty-feature-card-accent {
+  background:
+    radial-gradient(circle at top right, rgba(45, 212, 191, 0.12), transparent 34%),
+    linear-gradient(145deg, rgba(14, 165, 233, 0.08), rgba(255, 255, 255, 0.94));
+}
+
+[data-theme="light"] .faculty-feature-card p,
+[data-theme="light"] .faculty-mini-panel p,
+[data-theme="light"] .faculty-focus-item p,
+[data-theme="light"] .faculty-summary-item p,
+[data-theme="light"] .faculty-note-card p,
+[data-theme="light"] .faculty-alert-card p,
+[data-theme="light"] .faculty-ranked-copy p,
+[data-theme="light"] .faculty-workbench-main p,
+[data-theme="light"] .faculty-workbench-side p {
+  color: #475569;
+}
+
+[data-theme="light"] .faculty-mini-metric {
+  background: rgba(14, 165, 233, 0.12);
+  color: #0369a1;
+}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { PlatformLayout } from "../../components/PlatformLayout";
-import CourseAssessmentWorkspace from "../../components/CourseAssessmentWorkspace";
+import { PlatformLayout } from "../../components/PlatformLayout/PlatformLayout";
+import CourseAssessmentWorkspace from "../../components/CourseAssessmentWorkspace/CourseAssessmentWorkspace";
 import { apiRequest } from "../../utils/api";
 import { getStudentSession, getFacultySession, getAdminSession } from "../../utils/session";
 

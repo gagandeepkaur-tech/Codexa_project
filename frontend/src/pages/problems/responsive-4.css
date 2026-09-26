@@ -1,0 +1,11 @@
+@media (max-width: 860px) {
+
+  .workspace-requirement-grid,
+  .workspace-result-overview {
+    grid-template-columns: 1fr;
+  }
+
+  .workspace-info-card-wide {
+    grid-column: auto;
+  }
+}

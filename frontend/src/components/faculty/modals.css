@@ -1,0 +1,58 @@
+/* Modal & Drawer Overlays */
+.fd-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 8, 14, 0.82);
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1.5rem;
+  animation: fdFadeIn 0.2s ease forwards;
+}
+.fd-modal-card {
+  background: var(--fd-surface);
+  border: 1px solid rgba(124, 92, 255, 0.3);
+  border-radius: var(--fd-radius-lg);
+  width: min(620px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--fd-shadow), 0 0 40px rgba(124, 92, 255, 0.2);
+  color: #ffffff;
+  padding: 2rem;
+}
+.fd-drawer-card {
+  position: fixed;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: min(780px, 92vw);
+  background: var(--fd-surface);
+  border-left: 1px solid var(--fd-border);
+  box-shadow: -20px 0 50px rgba(0, 0, 0, 0.6);
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  animation: fdSlideLeft 0.3s ease forwards;
+}
+@keyframes fdFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes fdSlideLeft {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}

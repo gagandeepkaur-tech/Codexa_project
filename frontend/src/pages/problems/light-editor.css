@@ -1,0 +1,37 @@
+[data-theme="light"] .code-editor-shell {
+  background: #f1f5f9;
+  border-color: rgba(148, 163, 184, 0.22);
+}
+
+[data-theme="light"] .code-editor-gutter {
+  background: transparent;
+  color: #94a3b8;
+}
+
+[data-theme="light"] .code-editor-highlight {
+  color: #0f172a;
+}
+
+[data-theme="light"] .code-editor-input {
+  color: transparent !important;
+  caret-color: #0f172a;
+  -webkit-text-fill-color: transparent !important;
+}
+
+[data-theme="light"] .editor-suggestion-panel {
+  background: rgba(255, 255, 255, 0.94);
+  border-color: rgba(148, 163, 184, 0.24);
+}
+
+[data-theme="light"] .editor-suggestion-item,
+[data-theme="light"] .editor-zoom-button {
+  background: rgba(248, 250, 252, 0.92);
+  color: #0f172a;
+  border-color: rgba(148, 163, 184, 0.22);
+}
+
+[data-theme="light"] .workspace-console-output {
+  background: #eff6ff;
+  border-color: rgba(148, 163, 184, 0.24);
+  color: #1d4ed8;
+}

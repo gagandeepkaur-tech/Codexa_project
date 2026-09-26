@@ -1,0 +1,9 @@
+@media (max-width: 640px) {
+
+  .platform-stats-grid,
+  .dashboard-stats,
+  .auth-side-metrics,
+  .quick-actions-row {
+    grid-template-columns: 1fr;
+  }
+}

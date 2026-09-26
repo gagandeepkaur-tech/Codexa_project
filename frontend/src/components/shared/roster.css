@@ -1,0 +1,162 @@
+/* Modern Roster Directory & Student Cards */
+.roster-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  padding: 0.85rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.roster-search-wrapper {
+  position: relative;
+  flex: 1;
+  min-width: 260px;
+}
+.roster-search-icon {
+  position: absolute;
+  left: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #64748b;
+  pointer-events: none;
+}
+.roster-search-input {
+  width: 100%;
+  padding: 0.55rem 0.85rem 0.55rem 2.5rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(15, 23, 42, 0.6);
+  color: #f8fafc;
+  font-size: 0.875rem;
+  outline: none;
+  transition: all 0.15s ease;
+}
+.roster-search-input:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
+  background: rgba(15, 23, 42, 0.85);
+}
+.roster-filter-select {
+  padding: 0.5rem 2.2rem 0.5rem 0.9rem;
+  border-radius: 10px;
+  border: 1px solid rgba(124, 92, 255, 0.35);
+  background: linear-gradient(145deg, #1E293B, #0F172A);
+  color: #f8fafc;
+  font-size: 0.84rem;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23A78BFA' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.7rem center;
+  background-size: 14px;
+  transition: all 0.2s ease;
+}
+.roster-filter-select:hover {
+  border-color: #7C5CFF;
+  box-shadow: 0 0 14px rgba(124, 92, 255, 0.3);
+}
+.roster-filter-select:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.3), 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+.roster-filter-select option,
+select option {
+  background-color: #0F172A !important;
+  color: #F8FAFC !important;
+  padding: 10px 14px !important;
+  font-size: 0.86rem !important;
+  font-weight: 500 !important;
+}
+.roster-filter-select option:checked,
+select option:checked {
+  background-color: #1E293B !important;
+  color: #38BDF8 !important;
+  font-weight: 700 !important;
+}
+.roster-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+.student-roster-card {
+  padding: 1.25rem;
+  border-radius: 12px;
+  background: var(--lc-bg-card);
+  border: 1px solid var(--lc-border);
+  transition: all 0.2s ease;
+  position: relative;
+}
+.student-roster-card:hover {
+  border-color: rgba(56, 189, 248, 0.4);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+.student-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+.student-info-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+.student-avatar-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+}
+.student-name {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--lc-text-primary);
+  line-height: 1.3;
+}
+.student-email {
+  font-size: 0.825rem;
+  color: var(--lc-text-secondary);
+}
+.student-badges-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.roll-number-badge {
+  font-size: 0.725rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 0.25rem 0.65rem;
+  border-radius: 6px;
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+}
+.academic-meta-badge {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.25rem 0.65rem;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #94a3b8;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}

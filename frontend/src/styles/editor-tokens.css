@@ -1,0 +1,17 @@
+:root {
+  --vscode-bg: #1e1e1e;
+  --vscode-sidebar: #181818;
+  --vscode-panel: #252526;
+  --vscode-card: #2d2d30;
+  --vscode-card-soft: #333337;
+  --vscode-border: #3c3c3c;
+  --vscode-border-strong: #4b4b4b;
+  --vscode-text: #d4d4d4;
+  --vscode-text-muted: #9da5b4;
+  --vscode-text-soft: #808791;
+  --vscode-accent: #0e639c;
+  --vscode-accent-hover: #1177bb;
+  --vscode-success: #4ec9b0;
+  --vscode-warning: #d7ba7d;
+  --vscode-error: #f48771;
+}

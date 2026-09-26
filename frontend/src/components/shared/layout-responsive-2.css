@@ -1,0 +1,12 @@
+@media (max-width: 1180px) {
+
+  .platform-stats-grid,
+  .quick-actions-row,
+  .course-grid,
+  .faculty-feature-grid,
+  .faculty-summary-band,
+  .dashboard-stats,
+  .auth-side-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

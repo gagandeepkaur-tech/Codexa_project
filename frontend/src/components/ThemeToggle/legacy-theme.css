@@ -1,0 +1,9 @@
+[data-theme="light"] .theme-toggle-button {
+  background: #ffffff;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+
+[data-theme="light"] .theme-toggle-copy small {
+  color: #475569;
+}

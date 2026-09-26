@@ -1,0 +1,8 @@
+@media (max-width: 1180px) {
+
+  .platform-hero-side {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+}

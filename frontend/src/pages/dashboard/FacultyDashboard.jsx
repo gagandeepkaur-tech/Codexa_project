@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
-import { PlatformLayout, PlatformSection, PlatformStats } from "../../components/PlatformLayout";
+import { PlatformLayout, PlatformSection, PlatformStats } from "../../components/PlatformLayout/PlatformLayout";
 import { getFacultySession, clearFacultySession, saveFacultySession } from "../../utils/session";
 
 import FacultyDashboardOverview from "../../components/faculty/FacultyDashboardOverview";

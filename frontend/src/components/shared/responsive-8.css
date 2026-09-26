@@ -1,0 +1,15 @@
+@media (max-width: 860px) {
+
+  .list-header {
+    flex-direction: column;
+  }
+
+  .filter-select {
+    flex-basis: 100%;
+  }
+
+  .selection-inline {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

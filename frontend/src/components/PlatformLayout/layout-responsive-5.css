@@ -1,0 +1,12 @@
+@media (max-width: 640px) {
+
+  .platform-tab-bar {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+  }
+
+  .platform-tab {
+    white-space: nowrap;
+  }
+}

@@ -1,0 +1,88 @@
+[data-theme="light"] .workspace-arrow,
+[data-theme="light"] .workspace-meta-chip,
+[data-theme="light"] .auth-switcher,
+[data-theme="light"] .auth-badge,
+[data-theme="light"] .auth-feature-item,
+[data-theme="light"] .landing-stat-strip article {
+  background: rgba(255, 255, 255, 0.72);
+  border-color: rgba(148, 163, 184, 0.22);
+  color: #1e293b;
+}
+
+[data-theme="light"] .platform-nav-item.active,
+[data-theme="light"] .platform-nav-item:hover {
+  background: rgba(14, 165, 233, 0.1);
+}
+
+[data-theme="light"] .auth-copy,
+[data-theme="light"] .login-copy,
+[data-theme="light"] .dashboard-copy,
+[data-theme="light"] .detail-copy,
+[data-theme="light"] .platform-hero-text,
+[data-theme="light"] .platform-sidebar-copy p,
+[data-theme="light"] .landing-copy,
+[data-theme="light"] .language-card p,
+[data-theme="light"] .feature-card p,
+[data-theme="light"] .question-card p,
+[data-theme="light"] .workspace-statement-copy,
+[data-theme="light"] .workspace-info-card p,
+[data-theme="light"] .history-snippet,
+[data-theme="light"] .question-meta,
+[data-theme="light"] .workspace-topbar-note,
+[data-theme="light"] .editor-suggestion-item span,
+[data-theme="light"] .auth-form-panel-copy,
+[data-theme="light"] .auth-feature-item p,
+[data-theme="light"] .platform-stat-card p,
+[data-theme="light"] .progress-card p {
+  color: #475569;
+}
+
+[data-theme="light"] .auth-form input,
+[data-theme="light"] .auth-form select,
+[data-theme="light"] .auth-form textarea,
+[data-theme="light"] .filter-input,
+[data-theme="light"] .filter-select,
+[data-theme="light"] .editor-toolbar select {
+  background: rgba(255, 255, 255, 0.94);
+  color: #0f172a;
+  border-color: rgba(148, 163, 184, 0.28);
+}
+
+[data-theme="light"] .custom-select-trigger {
+  background: rgba(255, 255, 255, 0.94);
+  color: #0f172a;
+  border-color: rgba(148, 163, 184, 0.28);
+}
+
+[data-theme="light"] .custom-select-menu {
+  background: #ffffff;
+  border-color: rgba(148, 163, 184, 0.28);
+  box-shadow: 0 20px 48px rgba(148, 163, 184, 0.24);
+}
+
+[data-theme="light"] .custom-select-option {
+  color: #0f172a;
+}
+
+[data-theme="light"] .custom-select-option:hover,
+[data-theme="light"] .custom-select-option.active {
+  background: rgba(14, 165, 233, 0.12);
+}
+
+[data-theme="light"] .custom-select-empty {
+  color: #64748b;
+}
+
+[data-theme="light"] .auth-form select option,
+[data-theme="light"] .filter-select option,
+[data-theme="light"] .editor-toolbar select option {
+  background: #ffffff;
+  color: #0f172a;
+}
+
+[data-theme="light"] .auth-form input::placeholder,
+[data-theme="light"] .filter-input::placeholder,
+[data-theme="light"] .code-editor-input::placeholder {
+  color: #94a3b8;
+  -webkit-text-fill-color: #94a3b8;
+}

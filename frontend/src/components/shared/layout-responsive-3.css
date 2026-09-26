@@ -1,0 +1,13 @@
+@media (max-width: 1024px) {
+
+  .auth-page {
+    grid-template-columns: 1fr;
+    padding: 1.5rem 1rem;
+  }
+
+  .auth-panel,
+  .dashboard-card,
+  .auth-side {
+    padding: 1.5rem;
+  }
+}

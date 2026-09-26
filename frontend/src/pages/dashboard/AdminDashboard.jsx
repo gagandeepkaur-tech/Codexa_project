@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import StudentProgressAnalytics from "../../components/StudentProgressAnalytics";
-import { PlatformLayout } from "../../components/PlatformLayout";
+import StudentProgressAnalytics from "../../components/StudentProgressAnalytics/StudentProgressAnalytics";
+import { PlatformLayout } from "../../components/PlatformLayout/PlatformLayout";
 import { getAdminSession, getAuthHeaders } from "../../utils/session";
 import { apiRequest } from "../../utils/api";
 

@@ -1,0 +1,7 @@
+@media (max-width: 860px) {
+
+  .detail-hero {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

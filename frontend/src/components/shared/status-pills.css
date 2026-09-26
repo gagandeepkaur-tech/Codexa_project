@@ -1,0 +1,49 @@
+.difficulty-pill {
+  display: inline-flex;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.difficulty-pill.easy {
+  background: rgba(34, 197, 94, 0.18);
+  color: #bbf7d0;
+}
+
+.difficulty-pill.medium {
+  background: rgba(250, 204, 21, 0.16);
+  color: #fde68a;
+}
+
+.difficulty-pill.hard {
+  background: rgba(248, 113, 113, 0.16);
+  color: #fecaca;
+}
+
+.status-pill {
+  display: inline-flex;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.status-pill.accepted {
+  background: rgba(34, 197, 94, 0.18);
+  color: #bbf7d0;
+}
+
+.status-pill.wrong_answer {
+  background: rgba(248, 113, 113, 0.16);
+  color: #fecaca;
+}
+
+.status-pill.time_limit {
+  background: rgba(250, 204, 21, 0.16);
+  color: #fde68a;
+}

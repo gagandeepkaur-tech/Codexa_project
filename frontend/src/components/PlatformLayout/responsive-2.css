@@ -1,0 +1,15 @@
+@media (max-width: 860px) {
+
+  .platform-main {
+    padding: 1rem;
+  }
+
+  .platform-hero,
+  .platform-section-head {
+    flex-direction: column;
+  }
+
+  .platform-hero-side {
+    justify-items: start;
+  }
+}

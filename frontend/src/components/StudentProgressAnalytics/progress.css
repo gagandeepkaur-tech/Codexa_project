@@ -1,0 +1,61 @@
+.progress-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+.progress-card,
+.history-card {
+  padding: 1.1rem;
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
+  border: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.progress-card strong,
+.history-card strong {
+  display: block;
+  margin-top: 0.9rem;
+  font-size: 1.05rem;
+}
+
+.progress-card p {
+  margin: 0.45rem 0 0;
+  color: #dbe4f0;
+}
+
+.progress-meter {
+  width: 100%;
+  height: 12px;
+  margin-top: 1rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.progress-meter-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 220ms ease;
+}
+
+.progress-meter-fill.easy {
+  background: linear-gradient(90deg, #22c55e, #4ade80);
+}
+
+.progress-meter-fill.medium {
+  background: linear-gradient(90deg, #f59e0b, #facc15);
+}
+
+.progress-meter-fill.hard {
+  background: linear-gradient(90deg, #ef4444, #fb7185);
+}
+
+.progress-percent {
+  display: inline-flex;
+  margin-top: 0.65rem;
+  color: #e2e8f0;
+  font-size: 0.9rem;
+  font-weight: 700;
+}

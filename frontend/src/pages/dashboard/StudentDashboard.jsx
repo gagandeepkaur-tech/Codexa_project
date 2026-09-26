@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { PlatformLayout } from "../../components/PlatformLayout";
+import { PlatformLayout } from "../../components/PlatformLayout/PlatformLayout";
 import { getStudentSession } from "../../utils/session";
 import { apiRequest } from "../../utils/api";
 

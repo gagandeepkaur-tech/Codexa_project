@@ -1,0 +1,121 @@
+.course-card {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.course-directory-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.course-program-directory,
+.course-program-courses {
+  display: grid;
+  gap: 1rem;
+}
+
+.course-program-group {
+  min-width: 0;
+}
+
+.course-program-heading {
+  margin: 0 0 0.7rem;
+  padding-bottom: 0.55rem;
+  border-bottom: 1px solid var(--lc-border);
+  color: var(--lc-text-primary);
+  font-size: 1.05rem;
+}
+
+.course-program-courses {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+}
+
+.course-key-field {
+  display: grid;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.course-key-field > span {
+  color: var(--lc-text-secondary);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.course-directory-name {
+  margin: 0.55rem 0 0;
+  overflow-wrap: anywhere;
+}
+
+.course-cohort-list {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.course-cohort-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.7rem 0;
+  border-top: 1px solid var(--lc-border);
+}
+
+.course-cohort-heading {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.course-cohort-heading span {
+  color: var(--lc-text-secondary);
+  font-size: 0.8rem;
+}
+
+.course-section-keys {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.4rem;
+}
+
+.course-section-key {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0.25rem 0.55rem;
+  border: 1px solid var(--lc-border);
+  border-radius: 6px;
+  color: var(--lc-text-primary);
+  font-family: var(--lc-font-mono, monospace);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.course-form-grid {
+  display: grid;
+  gap: 0.9rem;
+  overflow: visible;
+}
+
+.course-test-case-grid {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.course-builder-top-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.course-builder-summary-card {
+  padding: 1rem 1.1rem;
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  background: linear-gradient(180deg, rgba(14, 99, 156, 0.12), rgba(255, 255, 255, 0.03));
+}

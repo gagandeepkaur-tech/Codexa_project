@@ -1,0 +1,23 @@
+[data-theme="light"] .platform-brand {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .platform-brand strong {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .platform-brand-mark,
+[data-theme="light"] .platform-sidebar-label,
+[data-theme="light"] .platform-eyebrow,
+[data-theme="light"] .platform-section-label {
+  color: #0284c7 !important;
+}
+
+[data-theme="light"] .platform-sidebar {
+  background: #ffffff !important;
+  border-right: 1px solid #e2e8f0 !important;
+}
+
+[data-theme="light"] .platform-sidebar-copy h2 {
+  color: #0f172a !important;
+}

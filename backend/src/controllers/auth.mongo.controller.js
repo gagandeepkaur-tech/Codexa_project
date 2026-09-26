@@ -220,10 +220,10 @@ export const registerUser = asyncHandler(async (req, res) => {
 });
 
 export const loginUser = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
+  const { email, identifier = email, password } = req.body;
 
-  if (!email?.trim() || !password?.trim()) {
-    return res.status(400).json({ message: "Email and password are required." });
+  if (!identifier?.trim() || !password?.trim()) {
+    return res.status(400).json({ message: "Username or email and password are required." });
   }
 
   const client = await pool.connect();
@@ -231,11 +231,15 @@ export const loginUser = asyncHandler(async (req, res) => {
   try {
     const result = await client.query(
       `
-        SELECT id, full_name, email, password_hash, role, created_at
-        FROM users
-        WHERE email = $1
+        SELECT u.id, u.full_name, u.email, u.password_hash, u.role, u.created_at
+        FROM users u
+        LEFT JOIN student_profiles sp ON sp.user_id = u.id
+        WHERE LOWER(u.email) = $1
+           OR (u.role = 'student' AND LOWER(sp.roll_number) = $1)
+        ORDER BY CASE WHEN LOWER(u.email) = $1 THEN 0 ELSE 1 END
+        LIMIT 1
       `,
-      [email.trim().toLowerCase()]
+      [identifier.trim().toLowerCase()]
     );
 
     if (result.rows.length === 0) {

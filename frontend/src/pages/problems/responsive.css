@@ -1,0 +1,146 @@
+@media (max-width: 860px) {
+  .mobile-workspace-tabs {
+    display: flex;
+    background: #1e1e1e;
+    border: 1px solid #2d2d2d;
+    margin-bottom: 0.5rem;
+    border-radius: 12px;
+    padding: 4px;
+    gap: 4px;
+  }
+
+  [data-theme="light"] .mobile-workspace-tabs {
+    background: #f3f4f6;
+    border-color: #e5e7eb;
+  }
+
+  .mobile-workspace-tab {
+    flex: 1;
+    padding: 0.6rem 0.5rem;
+    text-align: center;
+    background: transparent;
+    border: none;
+    color: var(--lc-text-secondary);
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    transition: all 0.2s ease;
+  }
+
+  .mobile-workspace-tab.active {
+    background: #2a2a2a;
+    color: var(--lc-text-primary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  [data-theme="light"] .mobile-workspace-tab.active {
+    background: #ffffff;
+    color: #000000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+
+  .workspace-column.mobile-hidden {
+    display: none !important;
+  }
+
+  .brand-text-desktop {
+    display: none;
+  }
+
+  .leetcode-logo,
+  .leetcode-logo-separator,
+  .leetcode-topbar-center,
+  .leetcode-topbar-right {
+    display: none !important;
+  }
+
+  .leetcode-topbar {
+    padding: 0.5rem 0.5rem !important;
+    gap: 4px !important;
+  }
+
+  .mobile-editor-footer {
+    display: none;
+  }
+
+  .mobile-editor-footer.show {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    background: #1a1a1a;
+    border-top: 1px solid #2d2d2d;
+    padding: 0 1rem;
+    z-index: 1000;
+    box-sizing: border-box;
+  }
+
+  [data-theme="light"] .mobile-editor-footer.show {
+    background: #ffffff;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  .mobile-console-btn,
+  .mobile-run-btn {
+    background: #262626 !important;
+    border: 1px solid #3d3d3d !important;
+    color: #eff1f5 !important;
+    padding: 0.4rem 0.8rem !important;
+    border-radius: 6px !important;
+    font-size: 0.85rem !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+  }
+
+  [data-theme="light"] .mobile-console-btn,
+  [data-theme="light"] .mobile-run-btn {
+    background: #f3f4f6 !important;
+    border-color: #e5e7eb !important;
+    color: #374151 !important;
+  }
+
+  .mobile-submit-btn {
+    background: #2cbb5d !important;
+    border: none !important;
+    color: #ffffff !important;
+    padding: 0.4rem 0.8rem !important;
+    border-radius: 6px !important;
+    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+  }
+
+  .editor-form {
+    padding-bottom: 60px !important;
+  }
+
+  .leetcode-topbar-left,
+  .leetcode-topbar-center,
+  .leetcode-topbar-right {
+    gap: 4px !important;
+  }
+
+  .leetcode-topbar span {
+    font-size: 0.8rem;
+  }
+
+  .leetcode-timer-chip {
+    padding: 0.2rem 0.3rem !important;
+    font-size: 0.8rem;
+  }
+}

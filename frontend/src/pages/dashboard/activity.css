@@ -1,0 +1,66 @@
+/* Recent Activity Section */
+.recent-activity-section {
+  background: var(--lc-bg-card);
+  border: 1px solid var(--lc-border);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+}
+.recent-activity-header {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--lc-text-primary);
+  margin-bottom: 0.75rem;
+}
+.recent-activity-list {
+  display: flex;
+  flex-direction: column;
+}
+.activity-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.95rem 0.5rem;
+  border-bottom: 1px solid var(--lc-border);
+}
+.activity-item-row:last-child {
+  border-bottom: none;
+}
+.activity-item-left {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+.activity-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.activity-dot.green {
+  background: var(--lc-success);
+  box-shadow: 0 0 8px rgba(44, 187, 93, 0.4);
+}
+.activity-dot.orange {
+  background: var(--lc-accent);
+  box-shadow: 0 0 8px rgba(255, 161, 22, 0.4);
+}
+.activity-dot.purple {
+  background: #a855f7;
+  box-shadow: 0 0 8px rgba(168, 85, 247, 0.4);
+}
+.activity-dot.yellow {
+  background: #eab308;
+  box-shadow: 0 0 8px rgba(234, 179, 8, 0.4);
+}
+.activity-dot.gray {
+  background: var(--lc-text-secondary);
+}
+.activity-text {
+  font-size: 0.875rem;
+  color: var(--lc-text-primary);
+}
+.activity-time {
+  font-size: 0.8rem;
+  color: var(--lc-text-secondary);
+  flex-shrink: 0;
+}

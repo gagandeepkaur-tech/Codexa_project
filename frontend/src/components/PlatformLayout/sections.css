@@ -1,0 +1,33 @@
+/* Platform Section Cards */
+.platform-section-card {
+  background: var(--lc-bg-card);
+  border: 1px solid var(--lc-border);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.25rem;
+}
+.platform-section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.platform-section-head h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--lc-text-primary);
+}
+.platform-section-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--lc-accent);
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  letter-spacing: 0.05em;
+}
+.platform-section-actions {
+  display: flex;
+  gap: 0.5rem;
+}

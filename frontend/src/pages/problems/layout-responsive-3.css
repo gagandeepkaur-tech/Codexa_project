@@ -1,0 +1,40 @@
+@media (max-width: 640px) {
+
+  .workspace-toast {
+    top: auto;
+    right: 0.75rem;
+    bottom: calc(0.75rem + env(safe-area-inset-bottom));
+    left: 0.75rem;
+    min-width: 0;
+    max-width: none;
+  }
+
+  .mobile-editor-footer.show {
+    height: auto;
+    min-height: 56px;
+    padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .mobile-editor-footer .mobile-footer-actions-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .mobile-console-btn,
+  .mobile-run-btn,
+  .mobile-submit-btn {
+    flex: 1 1 0;
+    justify-content: center;
+  }
+
+  .leetcode-topbar-left {
+    width: 100%;
+  }
+
+  .editor-form {
+    height: 26rem !important;
+    min-height: 26rem !important;
+  }
+}

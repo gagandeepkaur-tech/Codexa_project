@@ -1,0 +1,10 @@
+@media (max-width: 860px) {
+
+  .auth-page {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-side {
+    min-height: 220px;
+  }
+}

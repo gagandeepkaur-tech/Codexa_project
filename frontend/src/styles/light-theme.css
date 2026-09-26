@@ -1,0 +1,37 @@
+[data-theme="light"] {
+  color-scheme: light;
+  color: #262626;
+  background: #fafafa;
+
+  /* LeetCode Light Theme Color Variables */
+  --lc-bg-main: #fafafa;
+  --lc-bg-card: #ffffff;
+  --lc-border: #eeeeee;
+  --lc-accent: #ffa116;
+  --lc-accent-hover: #ffb84d;
+  --lc-text-primary: #262626;
+  --lc-text-secondary: #595959;
+  --lc-success: #2cbb5d;
+  --lc-warning: #ffa116;
+  --lc-danger: #ef4743;
+
+  /* VSCode variables for light mode */
+  --vscode-bg: #ffffff;
+  --vscode-sidebar: #f5f5f5;
+  --vscode-panel: #ffffff;
+  --vscode-card: #ffffff;
+  --vscode-card-soft: #fbfbfb;
+  --vscode-border: #e8e8e8;
+  --vscode-border-strong: #d9d9d9;
+  --vscode-text: #262626;
+  --vscode-text-muted: #595959;
+  --vscode-text-soft: #8c8c8c;
+  --vscode-accent: #0284c7;
+  --vscode-accent-hover: #0369a1;
+}
+
+[data-theme="light"] body,
+[data-theme="light"] #root {
+  color: #262626;
+  background: #fafafa;
+}

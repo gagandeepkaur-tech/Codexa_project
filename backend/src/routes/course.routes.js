@@ -1,12 +1,15 @@
 import { Router } from "express";
 import {
   addCourseCodingProblem,
+  addCourseStudent,
   addCourseMaterial,
   createCourse,
   deleteCourse,
   getCourseById,
   getCourseFilters,
   getCourseStudents,
+  getCourseRoster,
+  importCourseStudents,
   listCourses,
   runCourseCodingProblem,
   submitCourseCodingProblem,
@@ -42,6 +45,9 @@ courseRouter.get("/:courseId", requireCourseAccess, validateStudentCourseAccess,
 courseRouter.put("/:courseId", requireRole("admin"), updateCourse);
 courseRouter.delete("/:courseId", requireRole("admin"), deleteCourse);
 courseRouter.get("/:courseId/students", requireCourseManagementAccess, getCourseStudents);
+courseRouter.get("/:courseId/enrollments", requireRole("admin"), requireCourseManagementAccess, getCourseRoster);
+courseRouter.post("/:courseId/enrollments", requireRole("admin"), requireCourseManagementAccess, addCourseStudent);
+courseRouter.post("/:courseId/enrollments/import", requireRole("admin"), requireCourseManagementAccess, importCourseStudents);
 courseRouter.get("/:courseId/assignments", requireCourseAccess, validateStudentCourseAccess, listAssignmentsForCourse);
 courseRouter.post("/:courseId/assignments", requireCourseManagementAccess, createAssignment);
 courseRouter.put("/:courseId/assignments/:assignmentId", requireCourseManagementAccess, updateAssignment);

@@ -1,0 +1,6 @@
+@media (max-width: 1180px) {
+
+  .faculty-hero-grid {
+    grid-template-columns: 1fr;
+  }
+}

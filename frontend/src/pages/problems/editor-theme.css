@@ -1,0 +1,42 @@
+.code-editor-shell {
+  border-color: var(--vscode-border);
+  background: var(--vscode-bg);
+}
+
+.code-editor-gutter {
+  background: transparent;
+  border-right-color: transparent;
+  color: #858585;
+}
+
+.code-editor-highlight {
+  color: #d4d4d4;
+}
+
+.code-editor-input {
+  color: transparent !important;
+  caret-color: #d4d4d4;
+  -webkit-text-fill-color: transparent !important;
+}
+
+.token-keyword {
+  color: #569cd6;
+}
+
+.token-string {
+  color: #ce9178;
+}
+
+.token-number {
+  color: #b5cea8;
+}
+
+.token-comment {
+  color: #6a9955;
+}
+
+.workspace-console-output {
+  background: rgba(30, 30, 30, 0.96);
+  border-color: var(--vscode-border);
+  color: #9cdcfe;
+}

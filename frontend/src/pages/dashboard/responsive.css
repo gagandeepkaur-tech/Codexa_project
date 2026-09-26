@@ -1,0 +1,6 @@
+@media (max-width: 860px) {
+
+  .dashboard-stats {
+    grid-template-columns: 1fr;
+  }
+}

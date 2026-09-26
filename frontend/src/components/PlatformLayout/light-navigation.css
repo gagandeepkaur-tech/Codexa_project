@@ -1,0 +1,49 @@
+[data-theme="light"] .platform-nav-item {
+  background: transparent !important;
+  border-color: transparent !important;
+  color: #475569 !important;
+}
+
+[data-theme="light"] .platform-nav-item:hover {
+  background: #f8fafc !important;
+  color: #0f172a !important;
+  border-color: #e2e8f0 !important;
+}
+
+[data-theme="light"] .platform-nav-item.active {
+  background: var(--lc-accent, #ff7e29) !important;
+  color: #ffffff !important;
+  border-color: var(--lc-accent, #ff7e29) !important;
+}
+
+/* Logout Button styling for light and dark modes */
+
+.platform-logout-btn {
+  margin-top: 2rem !important;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  background: rgba(239, 68, 68, 0.08) !important;
+  border: 1px solid rgba(239, 68, 68, 0.2) !important;
+  color: #fca5a5 !important;
+}
+
+.platform-logout-btn:hover {
+  background: rgba(239, 68, 68, 0.16) !important;
+  border-color: rgba(239, 68, 68, 0.3) !important;
+}
+
+[data-theme="light"] .platform-logout-btn {
+  background: #fef2f2 !important;
+  border: 1px solid #fecaca !important;
+  color: #dc2626 !important;
+}
+
+[data-theme="light"] .platform-logout-btn:hover {
+  background: #fee2e2 !important;
+  border-color: #fca5a5 !important;
+}

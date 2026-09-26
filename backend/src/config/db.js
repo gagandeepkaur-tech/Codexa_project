@@ -24,6 +24,11 @@ export async function checkDatabaseConnection() {
       ADD COLUMN IF NOT EXISTS target_batch VARCHAR(50) DEFAULT 'ALL',
       ADD COLUMN IF NOT EXISTS allow_faculty_edit BOOLEAN NOT NULL DEFAULT TRUE;
     `);
+    await client.query(`
+      ALTER TABLE courses
+      ADD COLUMN IF NOT EXISTS roster_restricted BOOLEAN NOT NULL DEFAULT FALSE,
+      ADD COLUMN IF NOT EXISTS program VARCHAR(120) NOT NULL DEFAULT '';
+    `);
     const result = await client.query("SELECT NOW() AS current_time");
     return result.rows[0];
   } finally {

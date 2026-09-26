@@ -1,0 +1,15 @@
+[data-theme="light"] .token-keyword {
+  color: #7c3aed;
+}
+
+[data-theme="light"] .token-string {
+  color: #15803d;
+}
+
+[data-theme="light"] .token-number {
+  color: #b45309;
+}
+
+[data-theme="light"] .token-comment {
+  color: #64748b;
+}

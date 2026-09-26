@@ -1,3 +1,4 @@
+import "./execution.css";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { getAuthHeaders, getStudentSession, getFacultySession, getAdminSession } from "../../utils/session";
@@ -1835,12 +1836,7 @@ export default function StudentProblemDetails() {
                             borderTopColor: "#8B5CF6",
                             animation: "leetcode-spin 0.8s linear infinite"
                           }}></div>
-                          <style>{`
-                          @keyframes leetcode-spin {
-                            0% { transform: rotate(0deg); }
-                            100% { transform: rotate(360deg); }
-                          }
-                        `}</style>
+
                           <p style={{ color: "#8a8a8a", fontSize: "0.9rem", fontWeight: "500" }}>
                             {isRunning ? "Running sample test cases..." : "Submitting code & analyzing results..."}
                           </p>

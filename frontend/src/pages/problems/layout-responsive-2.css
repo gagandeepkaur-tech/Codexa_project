@@ -1,0 +1,79 @@
+@media (max-width: 1024px) {
+
+  .leetcode-topbar {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 0.75rem;
+    height: auto;
+    padding: 0.75rem 1rem;
+  }
+
+  .leetcode-topbar-left,
+  .leetcode-topbar-center,
+  .leetcode-topbar-right {
+    flex-wrap: wrap;
+  }
+
+  .leetcode-topbar-right {
+    margin-left: auto;
+    justify-content: flex-end;
+  }
+
+  html:has(.student-detail-page),
+  body:has(.student-detail-page) {
+    overflow: auto !important;
+    height: auto !important;
+  }
+
+  .student-detail-page {
+    height: auto !important;
+    min-height: 100vh !important;
+    max-height: none !important;
+    overflow: auto !important;
+  }
+
+  .student-workspace-card {
+    height: auto !important;
+    min-height: 100vh !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .workspace-shell {
+    grid-template-columns: 1fr !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 0.75rem !important;
+  }
+
+  .workspace-problem-panel,
+  .editor-column {
+    grid-column: 1 !important;
+    grid-row: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    min-height: auto !important;
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+  }
+
+  .workspace-problem-content-scroll {
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+
+  .editor-form {
+    height: 30rem !important;
+    min-height: 30rem !important;
+  }
+
+  .code-editor-shell {
+    height: 100% !important;
+    min-height: 24rem !important;
+  }
+}

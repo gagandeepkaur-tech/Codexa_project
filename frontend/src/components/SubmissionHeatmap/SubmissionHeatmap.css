@@ -1,0 +1,233 @@
+.lc-heatmap-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 24px;
+  color: #EFF1F6;
+  font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+  margin-bottom: 24px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.lc-heatmap-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #38bdf8;
+  margin-bottom: 4px;
+}
+
+.lc-heatmap-main-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 20px 0;
+  letter-spacing: -0.4px;
+}
+
+.lc-heatmap-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.lc-heatmap-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lc-heatmap-title-count {
+  font-weight: 800;
+  font-size: 22px;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+}
+
+.lc-heatmap-title-text {
+  font-size: 14px;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.lc-heatmap-info-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: help;
+  margin-left: 2px;
+}
+
+.lc-heatmap-stats-group {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  font-size: 14px;
+  color: #94a3b8;
+}
+
+.lc-heatmap-stat-item strong {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.lc-heatmap-year-select {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: #eff1f6;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.lc-heatmap-year-select:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.lc-heatmap-scroll-area {
+  overflow-x: auto;
+  padding: 4px 0;
+}
+
+/* 12 Month Blocks Spaced Evenly across full card */
+.lc-heatmap-months-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  min-width: 780px;
+  width: 100%;
+  gap: 8px;
+}
+
+.lc-heatmap-month-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.lc-heatmap-month-name {
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 600;
+  text-align: left;
+}
+
+.lc-heatmap-month-weeks {
+  display: flex;
+  gap: 3.5px;
+}
+
+.lc-heatmap-week-col {
+  display: flex;
+  flex-direction: column;
+  gap: 3.5px;
+}
+
+.lc-heatmap-day-square {
+  width: 13px;
+  height: 13px;
+  border-radius: 2.5px;
+  transition: transform 0.15s ease, filter 0.15s ease;
+  position: relative;
+  cursor: pointer;
+}
+
+.lc-heatmap-day-square.padding {
+  background: transparent !important;
+  cursor: default;
+  pointer-events: none;
+}
+
+.lc-heatmap-day-square:not(.padding):hover {
+  transform: scale(1.4);
+  z-index: 10;
+  filter: brightness(1.3);
+}
+
+.lc-heatmap-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #0f172a;
+  color: #f8fafc;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  z-index: 100;
+}
+
+.lc-heatmap-legend {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: 18px;
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.lc-heatmap-legend-square {
+  width: 11px;
+  height: 11px;
+  border-radius: 2.5px;
+}
+
+[data-theme="light"] .lc-heatmap-card {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #0f172a !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
+}
+
+[data-theme="light"] .lc-heatmap-main-title,
+[data-theme="light"] .lc-heatmap-title-count,
+[data-theme="light"] .lc-heatmap-stat-item strong {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .lc-heatmap-title-text,
+[data-theme="light"] .lc-heatmap-stats-group,
+[data-theme="light"] .lc-heatmap-month-name,
+[data-theme="light"] .lc-heatmap-legend {
+  color: #64748b !important;
+}
+
+[data-theme="light"] .lc-heatmap-year-select {
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .lc-heatmap-year-select:hover {
+  background: #f1f5f9 !important;
+}
+
+[data-theme="light"] .lc-heatmap-header {
+  border-bottom-color: #e2e8f0 !important;
+}

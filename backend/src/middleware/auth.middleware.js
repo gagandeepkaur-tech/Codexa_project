@@ -143,7 +143,7 @@ export async function requireCourseAccess(req, res, next) {
   try {
     const courseResult = await pool.query(
       `
-        SELECT id, code, title, description, is_active
+        SELECT id, code, title, description, is_active, roster_restricted
         FROM courses
         WHERE id = $1
       `,
@@ -185,6 +185,8 @@ export async function requireCourseAccess(req, res, next) {
 
       if (enrollment) {
         allowed = true;
+      } else if (course.roster_restricted) {
+        allowed = false;
       } else if (req.roleProfile) {
         const studentBranch = (req.roleProfile.branch || "").trim().toUpperCase();
         const studentSem = Number(req.roleProfile.semester) || 1;
@@ -232,7 +234,7 @@ export async function requireCourseAccess(req, res, next) {
           }
         }
       } else {
-        allowed = true;
+        allowed = false;
       }
     }
 
@@ -257,7 +259,7 @@ export async function requireCourseManagementAccess(req, res, next) {
   try {
     const courseResult = await pool.query(
       `
-        SELECT id, code, title, description, is_active
+        SELECT id, code, title, description, is_active, roster_restricted
         FROM courses
         WHERE id = $1
       `,
@@ -300,6 +302,13 @@ export async function requireCourseManagementAccess(req, res, next) {
 export async function validateStudentCourseAccess(req, res, next) {
   try {
     if (req.currentUser?.role !== "student") {
+      return next();
+    }
+
+    if (req.course.roster_restricted) {
+      if (!req.enrollment) {
+        return res.status(403).json({ message: "You must be enrolled in this course to access it." });
+      }
       return next();
     }
 

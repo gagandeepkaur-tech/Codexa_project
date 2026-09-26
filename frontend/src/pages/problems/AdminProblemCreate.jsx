@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { PlatformLayout, PlatformSection } from "../../components/PlatformLayout";
+import { PlatformLayout, PlatformSection } from "../../components/PlatformLayout/PlatformLayout";
 import { getAdminSession, getAuthHeaders } from "../../utils/session";
 
 const apiBaseUrl = import.meta.env.VITE_API_URL || "https://codexa-project.onrender.com/api";

@@ -1,0 +1,40 @@
+.dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin-top: 1.6rem;
+}
+
+.dashboard-actions,
+.detail-actions,
+.panel-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  margin-top: 1.5rem;
+  justify-content: center;
+}
+
+.dashboard-stats article {
+  padding: 1rem;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.dashboard-stats span {
+  display: block;
+  color: #cbd5e1;
+  font-size: 0.82rem;
+}
+
+.dashboard-stats strong {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 1rem;
+}
+
+.dashboard-link {
+  display: inline-flex;
+  margin-top: 1.5rem;
+}

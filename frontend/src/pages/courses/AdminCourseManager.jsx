@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { PlatformLayout, PlatformSection } from "../../components/PlatformLayout";
+import { PlatformLayout, PlatformSection } from "../../components/PlatformLayout/PlatformLayout";
 import { apiRequest } from "../../utils/api";
 import { getAdminSession } from "../../utils/session";
 import { branchOptions, buildSemesterOptions, sectionOptions } from "../../types/course";
 
 const initialForm = {
+  program: "",
   code: "",
   title: "",
   description: "",
@@ -17,6 +18,7 @@ const initialForm = {
 };
 
 const javaCourseTemplate = {
+  program: "B.Tech CSE",
   code: "JAVA-101",
   title: "Programming with Java",
   description:
@@ -27,6 +29,47 @@ const javaCourseTemplate = {
   batchTargets: ["2024-2028"],
   facultyIds: []
 };
+
+function getProgramLabel(course) {
+  return course.program?.trim() || (course.branchTargets || []).map((branch) => `B.Tech ${branch}`).join(", ") || "Unassigned program";
+}
+
+function groupCoursesByProgram(courses) {
+  const programs = new Map();
+  courses.forEach((course) => {
+    const program = getProgramLabel(course);
+    if (!programs.has(program)) programs.set(program, []);
+    programs.get(program).push(course);
+  });
+  return [...programs.entries()].sort(([first], [second]) => first.localeCompare(second));
+}
+
+function getCourseCohorts(course) {
+  const audiences = course.audiences?.length
+    ? course.audiences
+    : (course.batchTargets || []).flatMap((batch) => (course.semesterTargets || []).flatMap((semester) =>
+      (course.sectionTargets || []).map((section) => ({ batch, semester, section }))
+    ));
+  const cohorts = new Map();
+
+  audiences.forEach((audience) => {
+    const semester = Number(audience.semester);
+    const year = Math.ceil(semester / 2);
+    const branch = audience.branch || "Unspecified branch";
+    const batch = audience.batch || "Unspecified batch";
+    const key = `${branch}:${batch}:${year}`;
+    if (!cohorts.has(key)) cohorts.set(key, { branch, batch, year, semesters: new Set(), sections: new Set() });
+    cohorts.get(key).semesters.add(semester);
+    cohorts.get(key).sections.add(audience.section);
+  });
+
+  return [...cohorts.values()].sort((first, second) => first.branch.localeCompare(second.branch) || first.batch.localeCompare(second.batch) || first.year - second.year)
+    .map((cohort) => ({
+      ...cohort,
+      semesters: [...cohort.semesters].sort((first, second) => first - second),
+      sections: [...cohort.sections].sort((first, second) => first.localeCompare(second))
+    }));
+}
 
 function withFallbackOptions(filterData) {
   // Always merge static defaults with DB values so all standard options are visible
@@ -101,6 +144,7 @@ export default function AdminCourseManager() {
   });
   const [form, setForm] = useState(initialForm);
   const [editingCourseId, setEditingCourseId] = useState("");
+  const [isCourseFormOpen, setIsCourseFormOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [pickerValues, setPickerValues] = useState({
     branch: initialForm.branchTargets[0],
@@ -207,11 +251,11 @@ export default function AdminCourseManager() {
     event.preventDefault();
 
     // Client-side validation
-    if (form.branchTargets.length === 0 || form.semesterTargets.length === 0 ||
+    if (!form.program.trim() || !form.code.trim() || !form.title.trim() || form.branchTargets.length === 0 || form.semesterTargets.length === 0 ||
         form.sectionTargets.length === 0 || form.batchTargets.length === 0) {
       setStatus((current) => ({
         ...current,
-        error: "Please select at least one branch, semester, section, and batch.",
+        error: "Enter a program, course code and name, then select at least one branch, year/semester, section, and batch.",
         success: ""
       }));
       return;
@@ -247,6 +291,7 @@ export default function AdminCourseManager() {
       });
       setForm(initialForm);
       setEditingCourseId("");
+      setIsCourseFormOpen(false);
       loadData();
     } catch (error) {
       setStatus((current) => ({
@@ -286,7 +331,9 @@ export default function AdminCourseManager() {
 
   function startEdit(course) {
     setEditingCourseId(course.id);
+    setIsCourseFormOpen(true);
     setForm({
+      program: course.program || getProgramLabel(course),
       code: course.code,
       title: course.title,
       description: course.description,
@@ -310,43 +357,49 @@ export default function AdminCourseManager() {
     <PlatformLayout
       role="admin"
       eyebrow="Course Management"
-      title="Batch-wise course management"
-      subtitle="Assign faculty and choose exactly which branch, semester, section, and batch of students can see each course."
+      title="Courses"
+      subtitle="Browse programs, courses, cohorts, and sections from one directory."
       meta="Admin Control"
-      sidebarNote="Admin controls course visibility here. Students outside the selected semester, section, branch, or batch cannot see or open the course."
+      sidebarNote="Courses are organized by program, course code, cohort year, batch, and section. Student access follows the selected enrollment keys."
     >
-      <PlatformSection label="Course Builder" title={editingCourseId ? "Edit course" : "Create course"}>
+      {isCourseFormOpen && <PlatformSection label="Course Builder" title={editingCourseId ? "Edit course" : "Add course"}>
         <div className="platform-section-actions">
           <button className="auth-button admin-button panel-action-button" type="button" onClick={applyJavaCourseTemplate}>
             Load Java course template
           </button>
+          <button className="auth-button ghost-button panel-action-button" type="button" onClick={() => {
+            setIsCourseFormOpen(false);
+            setEditingCourseId("");
+            setForm(initialForm);
+            setStatus({ loading: false, error: "", success: "" });
+          }}>
+            Cancel
+          </button>
         </div>
         <form className="auth-form course-form-grid" onSubmit={handleSubmit}>
           <div className="course-builder-top-grid">
-            <input
-              placeholder="Course code"
-              value={form.code}
-              onChange={(event) => setForm((current) => ({ ...current, code: event.target.value }))}
-              required
-            />
-            <input
-              placeholder="Course title"
-              value={form.title}
-              onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))}
-              required
-            />
+            <label className="course-key-field">
+              <span>Program name</span>
+              <input placeholder="B.Tech IT" value={form.program} onChange={(event) => setForm((current) => ({ ...current, program: event.target.value }))} required />
+            </label>
+            <label className="course-key-field">
+              <span>Course code</span>
+              <input placeholder="ITD3" value={form.code} onChange={(event) => setForm((current) => ({ ...current, code: event.target.value }))} required />
+            </label>
+            <label className="course-key-field">
+              <span>Course name</span>
+              <input placeholder="B.Tech IT 3rd Year" value={form.title} onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))} required />
+            </label>
           </div>
 
-          <textarea
-            rows="4"
-            placeholder="Course description"
-            value={form.description}
-            onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))}
-          />
+          <label className="course-key-field">
+            <span>Description</span>
+            <textarea rows="3" placeholder="Optional course description" value={form.description} onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))} />
+          </label>
 
           <div className="selection-grid audience-selection-grid">
             <div className="selection-card">
-              <strong>Branches</strong>
+              <strong>Student branch keys</strong>
               <div className="selection-inline">
                 <PickerDropdown
                   className="filter-select"
@@ -394,7 +447,7 @@ export default function AdminCourseManager() {
             </div>
 
             <div className="selection-card">
-              <strong>Semesters allowed to view</strong>
+              <strong>Year / semester keys</strong>
               <div className="selection-inline">
                 <PickerDropdown
                   className="filter-select"
@@ -449,7 +502,7 @@ export default function AdminCourseManager() {
             </div>
 
             <div className="selection-card">
-              <strong>Sections</strong>
+              <strong>Section keys</strong>
               <div className="selection-inline">
                 <PickerDropdown
                   className="filter-select"
@@ -505,7 +558,7 @@ export default function AdminCourseManager() {
           </div>
 
           <div className="selection-card">
-            <strong>Student batches</strong>
+              <strong>Batch / cohort keys</strong>
             <div className="selection-inline">
               <PickerDropdown
                 className="filter-select"
@@ -601,7 +654,7 @@ export default function AdminCourseManager() {
 
           <div className="platform-section-actions">
             <button className="auth-button admin-button" type="submit" disabled={isSubmitting}>
-              {isSubmitting ? (editingCourseId ? "Saving…" : "Creating…") : (editingCourseId ? "Save course" : "Create course")}
+              {isSubmitting ? (editingCourseId ? "Saving…" : "Creating…") : (editingCourseId ? "Save course" : "Add course")}
             </button>
             {editingCourseId ? (
               <button
@@ -627,18 +680,23 @@ export default function AdminCourseManager() {
         </form>
         {status.success ? <p className="form-status success">{status.success}</p> : null}
         {status.error ? <p className="form-status error">{status.error}</p> : null}
-      </PlatformSection>
+      </PlatformSection>}
 
       <PlatformSection
-        label="Course Directory"
-        title="Live courses"
+        label="Course hierarchy"
+        title="All courses"
         actions={
-          <input
-            className="filter-input"
-            placeholder="Search courses"
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-          />
+          <div className="course-directory-actions">
+            <input className="filter-input" placeholder="Search courses" value={search} onChange={(event) => setSearch(event.target.value)} />
+            <button className="auth-button admin-button" type="button" onClick={() => {
+              setEditingCourseId("");
+              setForm(initialForm);
+              setIsCourseFormOpen(true);
+              setStatus({ loading: false, error: "", success: "" });
+            }}>
+              Add course
+            </button>
+          </div>
         }
       >
         {status.loading ? <p className="dashboard-copy">Loading courses...</p> : null}
@@ -646,34 +704,46 @@ export default function AdminCourseManager() {
           <p className="dashboard-copy">No courses created yet.</p>
         ) : null}
         {!status.loading && courses.length > 0 ? (
-          <div className="course-grid">
-            {courses.map((course) => (
-              <article className="question-card course-card" key={course.id}>
-                <div className="question-card-top">
-                  <span className="difficulty-pill medium">{course.code}</span>
-                  <span className="question-meta">{course.enrolledCount} enrolled</span>
+          <div className="course-program-directory">
+            {groupCoursesByProgram(courses).map(([program, programCourses]) => (
+              <section className="course-program-group" key={program}>
+                <h3 className="course-program-heading">{program}</h3>
+                <div className="course-program-courses">
+                  {programCourses.map((course) => (
+                    <article className="question-card course-card" key={course.id}>
+                      <div className="question-card-top">
+                        <div>
+                          <span className="difficulty-pill medium">{course.code}</span>
+                          <h3 className="course-directory-name">{course.title}</h3>
+                        </div>
+                        <span className="question-meta">{course.enrolledCount} enrolled</span>
+                      </div>
+                      {course.description && <p>{course.description}</p>}
+                      <div className="course-cohort-list">
+                        {getCourseCohorts(course).map((cohort) => (
+                          <div className="course-cohort-row" key={`${cohort.branch}-${cohort.batch}-${cohort.year}`}>
+                            <div className="course-cohort-heading">
+                              <strong>{cohort.branch} · Batch {cohort.batch} · Year {cohort.year}</strong>
+                              <span>Semester{cohort.semesters.length === 1 ? "" : "s"} {cohort.semesters.join(", ")}</span>
+                            </div>
+                            <div className="course-section-keys">
+                              {cohort.sections.map((section) => (
+                                <span className="course-section-key" key={section}>{course.code} {section}</span>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <p className="question-meta">Faculty: {course.faculty.map((member) => member.fullName).join(", ") || "Unassigned"}</p>
+                      <div className="platform-section-actions">
+                        <Link className="auth-button admin-button detail-link" to={`/admin/courses/${course.id}`}>Manage course</Link>
+                        <button className="auth-button admin-button detail-link" type="button" onClick={() => startEdit(course)}>Edit</button>
+                        <button className="auth-button danger-button detail-link" type="button" onClick={() => handleArchive(course.id)}>Archive</button>
+                      </div>
+                    </article>
+                  ))}
                 </div>
-                <h3>{course.title}</h3>
-                <p>{course.description || "No description added yet."}</p>
-                <p className="question-meta">
-                  {course.branchTargets.join(", ")} | Sem {course.semesterTargets.join(", ")} | Sec{" "}
-                  {course.sectionTargets.join(", ")} | Batches {course.batchTargets.join(", ")}
-                </p>
-                <p className="question-meta">
-                  Visible only to selected students. Faculty: {course.faculty.map((member) => member.fullName).join(", ")}
-                </p>
-                <div className="platform-section-actions">
-                  <Link className="auth-button admin-button detail-link" to={`/admin/courses/${course.id}`}>
-                    Manage course
-                  </Link>
-                  <button className="auth-button admin-button detail-link" type="button" onClick={() => startEdit(course)}>
-                    Edit
-                  </button>
-                  <button className="auth-button danger-button detail-link" type="button" onClick={() => handleArchive(course.id)}>
-                    Archive
-                  </button>
-                </div>
-              </article>
+              </section>
             ))}
           </div>
         ) : null}

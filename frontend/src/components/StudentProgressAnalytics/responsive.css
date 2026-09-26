@@ -1,0 +1,6 @@
+@media (max-width: 860px) {
+
+  .progress-grid {
+    grid-template-columns: 1fr;
+  }
+}

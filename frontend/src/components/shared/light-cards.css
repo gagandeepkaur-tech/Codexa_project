@@ -1,0 +1,23 @@
+[data-theme="light"] .auth-panel,
+[data-theme="light"] .dashboard-card,
+[data-theme="light"] .detail-card,
+[data-theme="light"] .detail-block,
+[data-theme="light"] .platform-hero,
+[data-theme="light"] .platform-section-card,
+[data-theme="light"] .landing-hero,
+[data-theme="light"] .language-panel,
+[data-theme="light"] .feature-card,
+[data-theme="light"] .auth-side,
+[data-theme="light"] .auth-form-card,
+[data-theme="light"] .workspace-result-card,
+[data-theme="light"] .workspace-info-card,
+[data-theme="light"] .sample-case-card,
+[data-theme="light"] .question-card,
+[data-theme="light"] .history-card,
+[data-theme="light"] .platform-stat-card,
+[data-theme="light"] .landing-role-card {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  color: #0f172a;
+}

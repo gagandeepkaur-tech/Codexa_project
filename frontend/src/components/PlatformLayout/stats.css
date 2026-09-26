@@ -1,0 +1,68 @@
+.platform-stat-card {
+  padding: 1.25rem;
+  border-radius: 12px;
+  border: 1px solid var(--lc-border);
+  background: var(--lc-bg-card);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card-icon-wrapper {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.stat-card-icon-wrapper.green {
+  background: rgba(44, 187, 93, 0.1);
+  color: var(--lc-success);
+}
+
+.stat-card-icon-wrapper.orange {
+  background: rgba(255, 161, 22, 0.1);
+  color: var(--lc-accent);
+}
+
+.stat-card-icon-wrapper.purple {
+  background: rgba(168, 85, 247, 0.1);
+  color: #a855f7;
+}
+
+.stat-card-icon-wrapper.yellow {
+  background: rgba(234, 179, 8, 0.15);
+  color: #eab308;
+}
+
+.platform-stat-card span {
+  display: block;
+  color: var(--lc-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.platform-stat-card strong {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: var(--lc-text-primary);
+}
+
+.platform-stat-card strong.long-value {
+  font-size: 1.15rem;
+  word-break: break-all;
+  overflow-wrap: break-word;
+  line-height: 1.35;
+  margin-top: 0.5rem;
+  font-weight: 600;
+}
+
+.platform-stat-card p {
+  display: none;
+}

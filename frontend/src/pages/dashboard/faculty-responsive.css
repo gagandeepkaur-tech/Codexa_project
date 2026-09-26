@@ -1,0 +1,29 @@
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .fd-sidebar {
+    transform: translateX(-100%);
+  }
+
+  .fd-sidebar.mobile-open {
+    transform: translateX(0);
+    width: 260px;
+  }
+
+  .fd-main-content {
+    margin-left: 0 !important;
+    max-width: 100vw !important;
+    padding: 1.2rem;
+  }
+
+  .fd-stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .fd-welcome-banner {
+    padding: 1.5rem;
+  }
+
+  .fd-welcome-title {
+    font-size: 1.4rem;
+  }
+}

@@ -1,0 +1,208 @@
+body,
+.landing-page,
+.student-auth-page,
+.admin-auth-page,
+.student-dashboard-page,
+.admin-dashboard-page,
+.student-platform-page,
+.admin-platform-page,
+.student-detail-page,
+.admin-detail-page {
+  color: var(--vscode-text);
+  background:
+    radial-gradient(circle at top left, rgba(14, 99, 156, 0.18), transparent 28%),
+    linear-gradient(145deg, #111111, var(--vscode-bg) 48%, #252526);
+}
+
+.platform-sidebar {
+  background: rgba(24, 24, 24, 0.96);
+  border-color: var(--vscode-border);
+}
+
+.platform-brand,
+.detail-block p,
+.workspace-statement-copy,
+.workspace-result-card strong,
+.auth-side h2,
+.auth-form-card-topline strong,
+.landing-hero h1,
+.language-panel h2,
+.question-card h3,
+.workspace-problem-title,
+.workspace-column-header h2,
+.workspace-editor-header h2 {
+  color: var(--vscode-text);
+}
+
+.platform-brand-mark,
+.platform-sidebar-label,
+.platform-eyebrow,
+.platform-section-label,
+.landing-kicker,
+.auth-kicker,
+.workspace-section-tag,
+.workspace-info-card span,
+.sample-case-block span,
+.workspace-result-card span,
+.platform-stat-card span,
+.auth-side-metrics span,
+.landing-stat-strip span,
+.auth-form-card-topline span {
+  color: #9cdcfe;
+}
+
+.landing-hero,
+.language-panel,
+.feature-card,
+.auth-panel,
+.dashboard-card,
+.detail-card,
+.detail-block,
+.auth-side,
+.auth-form-card,
+.platform-hero,
+.platform-section-card,
+.platform-stat-card,
+.question-card,
+.history-card,
+.workspace-result-card,
+.workspace-info-card,
+.sample-case-card,
+.auth-feature-item,
+.auth-side-metrics article,
+.landing-stat-strip article,
+.landing-role-card,
+.dashboard-stats article {
+  background: linear-gradient(180deg, rgba(45, 45, 48, 0.95), rgba(37, 37, 38, 0.9));
+  border-color: var(--vscode-border);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.24);
+}
+
+.student-workspace-card {
+  background:
+    linear-gradient(180deg, rgba(30, 30, 30, 0.98), rgba(37, 37, 38, 0.96)),
+    var(--vscode-bg);
+}
+
+.platform-sidebar-copy p,
+.platform-hero-text,
+.landing-copy,
+.feature-card p,
+.language-card p,
+.auth-copy,
+.login-copy,
+.dashboard-copy,
+.detail-copy,
+.workspace-topbar-note,
+.workspace-info-card p,
+.question-card p,
+.question-meta,
+.stats-inline,
+.history-snippet,
+.editor-suggestion-item span,
+.auth-form-panel-copy,
+.auth-feature-item p,
+.platform-stat-card p,
+.progress-card p,
+.dashboard-stats span {
+  color: var(--vscode-text-muted);
+}
+
+.platform-nav-item,
+.workspace-arrow,
+.workspace-tab,
+.workspace-meta-chip,
+.auth-badge,
+.ghost-button,
+.editor-zoom-button {
+  background: rgba(45, 45, 48, 0.92);
+  border-color: var(--vscode-border);
+  color: var(--vscode-text);
+}
+
+.platform-nav-item:hover,
+.workspace-arrow:hover,
+.workspace-tab.active,
+.editor-suggestion-item.active,
+.editor-suggestion-item:hover {
+  background: var(--lc-brand-glow, rgba(255, 126, 41, 0.2));
+  border-color: var(--lc-accent, #ff7e29);
+  color: var(--vscode-text);
+}
+
+.workspace-arrow-secondary,
+.platform-meta-chip,
+.question-count,
+.tag-pill,
+.landing-role-label {
+  background: rgba(14, 99, 156, 0.16);
+  border-color: var(--vscode-border);
+  color: #9cdcfe;
+}
+
+.auth-form input,
+.auth-form select,
+.auth-form textarea,
+.filter-input,
+.filter-select,
+.editor-toolbar select {
+  background: rgba(30, 30, 30, 0.96);
+  border-color: var(--vscode-border);
+  color: var(--vscode-text);
+}
+
+.auth-form input::placeholder,
+.filter-input::placeholder,
+.code-editor-input::placeholder {
+  color: var(--vscode-text-soft);
+  -webkit-text-fill-color: var(--vscode-text-soft);
+}
+
+.auth-form input:focus,
+.auth-form select:focus,
+.auth-form textarea:not(.code-editor-input):focus,
+.filter-input:focus,
+.filter-select:focus,
+.editor-toolbar select:focus {
+  border-color: var(--vscode-accent-hover);
+  box-shadow: 0 0 0 4px rgba(14, 99, 156, 0.18);
+}
+
+.auth-button,
+.student-button,
+.admin-button {
+  background: linear-gradient(135deg, var(--vscode-accent), var(--vscode-accent-hover));
+  color: #ffffff;
+}
+
+.form-status.success,
+.status-pill.accepted,
+.difficulty-pill.easy {
+  color: var(--vscode-success);
+}
+
+.form-status.error,
+.status-pill.wrong_answer,
+.difficulty-pill.hard {
+  color: rgb(43, 195, 43);
+}
+
+.status-pill.time_limit,
+.difficulty-pill.medium {
+  color: var(--vscode-warning);
+}
+
+.status-pill.accepted,
+.difficulty-pill.easy {
+  background: rgba(78, 201, 176, 0.14);
+}
+
+.status-pill.wrong_answer,
+.difficulty-pill.hard {
+  background: rgba(244, 135, 113, 0.14);
+}
+
+.status-pill.time_limit,
+.difficulty-pill.medium {
+  background: rgba(215, 186, 125, 0.14);
+}
